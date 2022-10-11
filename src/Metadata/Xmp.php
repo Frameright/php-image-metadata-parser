@@ -1,6 +1,8 @@
 <?php
 namespace CSD\Image\Metadata;
 
+use CSD\Image\Metadata\UnsupportedException;
+
 /**
  * Class to read XMP metadata from an image.
  *
@@ -1397,10 +1399,359 @@ class Xmp
     }
 
     /**
+     * @param string $shapeFilter
+     * @param string $roleFilter
+     *
+     * @return array
+     * @throws UnsupportedException
+     */
+    public function getImageRegions(
+        $shapeFilter = XmpShapeFilter::ANY,
+        $roleFilter = XmpRoleFilter::ANY)
+    {
+        if ($roleFilter !== XmpRoleFilter::ANY) {
+            throw new UnsupportedException(
+                'Role filters not supported yet'
+            );
+        }
+
+        $imageRegionNode = $this->getNode(
+            'Iptc4xmpExt:ImageRegion',
+            self::IPTC4_XMP_EXT_NS,
+            false
+        );
+        if (!$imageRegionNode) {
+            return [];
+        }
+
+        $imageRegionBag = $this->xpath->query('rdf:Bag', $imageRegionNode)
+                                      ->item(0);
+        if (!$imageRegionBag) {
+            return [];
+        }
+
+        $results = [];
+        foreach ($imageRegionBag->childNodes as $imageRegionItem) {
+            $imageRegion = new XmpImageRegion($this->xpath, $imageRegionItem);
+            array_push($results, $imageRegion);
+        }
+        return $results;
+    }
+
+    /**
      * @return bool
      */
     public function hasChanges()
     {
         return $this->hasChanges;
+    }
+}
+
+/**
+ * PHP5 enum.
+ */
+abstract class XmpShapeFilter
+{
+    public const ANY = '';
+    public const RECTANGLE = 'rectangle';
+    public const CIRCLE = 'circle';
+    public const POLYGON = 'polygon';
+
+    /**
+     * @param string $value RECTANGLE, CIRCLE or POLYGON.
+     *
+     * @return string The corresponding value of the <Iptc4xmpExt:rbShape>
+     *                element.
+     * @throws UnsupportedException
+     */
+    public static function getXmlRbShape($value)
+    {
+        switch ($value) {
+            case RECTANGLE:
+            case CIRCLE:
+            case POLYGON:
+                return $value;
+        }
+        throw new UnsupportedException('Unsupported region shape');
+    }
+}
+
+/**
+ * PHP5 enum.
+ */
+abstract class XmpRoleFilter
+{
+    public const ANY = '';
+    public const CROP = 'crop';
+
+    /**
+     * @param string $value CROP.
+     *
+     * @return array The list of <Iptc4xmpExt:rRole><Iptc4xmpExt:Name> values
+     *               that would match the filter.
+     * @throws UnsupportedException
+     */
+    public static function getMatchingRoleNames($value)
+    {
+        switch ($value) {
+            case CROP:
+                // See https://cv.iptc.org/newscodes/imageregionrole/
+                return [
+                    'cropping',
+                    'recommended cropping',
+                    'landscape format cropping',
+                    'portrait format cropping',
+                    'square format cropping',
+                ];
+        }
+        throw new UnsupportedException('Unsupported region role filter');
+    }
+
+    /**
+     * @param string $value CROP.
+     *
+     * @return array The list of <Iptc4xmpExt:rRole><Iptc4xmpExt:Identifier>
+     *               values that would match the filter.
+     * @throws UnsupportedException
+     */
+    public static function getMatchingRoleURIs($value)
+    {
+        switch ($value) {
+            case CROP:
+                // See https://cv.iptc.org/newscodes/imageregionrole/
+                return [
+                    'http://cv.iptc.org/newscodes/imageregionrole/cropping',
+                    'http://cv.iptc.org/newscodes/imageregionrole/recomCropping',
+                    'http://cv.iptc.org/newscodes/imageregionrole/landscapeCropping',
+                    'http://cv.iptc.org/newscodes/imageregionrole/portraitCropping',
+                    'http://cv.iptc.org/newscodes/imageregionrole/squareCropping',
+                ];
+        }
+        throw new UnsupportedException('Unsupported region role filter');
+    }
+}
+
+/**
+ * Represents an Image Region read from XMP metadata.
+ * See https://iptc.org/std/photometadata/specification/IPTC-PhotoMetadata#image-region
+ */
+class XmpImageRegion
+{
+    /**
+     * @var string|null
+     */
+    private $id;
+
+    /**
+     * @var array|null
+     */
+    private $names;
+
+    /**
+     * @var array|null
+     */
+    private $types;
+
+    /**
+     * @var array|null
+     */
+    private $roles;
+
+    /**
+     * 'rectangle', 'circle' or 'polygon'.
+     *
+     * @var string|null
+     */
+    private $rbShape;
+
+    /**
+     * E.g. 'relative'.
+     *
+     * @var string|null
+     */
+    private $rbUnit;
+
+    /**
+     * Rectangle or circle's coordinates.
+     *
+     * @var XmpImageRegionPoint
+     */
+    private $rbXY;
+
+    /**
+     * Rectangle's height.
+     *
+     * @var string|null
+     */
+    private $rbH;
+
+    /**
+     * Rectangle's width.
+     *
+     * @var string|null
+     */
+    private $rbW;
+
+    /**
+     * Circle's radius.
+     *
+     * @var string|null
+     */
+    private $rbRx;
+
+    /**
+     * Polygon's vertices.
+     *
+     * @var array|null
+     */
+    private $rbVertices;
+
+    /**
+     * @param \DOMXPath $xpath
+     * @param \DOMNode $node <rdf:li> node.
+     */
+    public function __construct($xpath, $node)
+    {
+        $this->id = self::getNodeValue($xpath, 'Iptc4xmpExt:rId', $node);
+        $this->names = self::getNodeValues(
+            $xpath,
+            'Iptc4xmpExt:Name/rdf:Alt/rdf:li',
+            $node
+        );
+        $this->types = self::getEntityOrConceptValues(
+            $xpath,
+            'Iptc4xmpExt:rCtype',
+            $node
+        );
+        $this->roles = self::getEntityOrConceptValues(
+            $xpath,
+            'Iptc4xmpExt:rRole',
+            $node
+        );
+
+        $xpathToRb = 'Iptc4xmpExt:RegionBoundary';
+
+        foreach ([
+            'rbShape',
+            'rbUnit',
+            'rbH',
+            'rbW',
+            'rbRx',
+        ] as $property) {
+            $this->$property = self::getNodeValue(
+                $xpath,
+                "$xpathToRb/Iptc4xmpExt:$property",
+                $node
+            );
+        }
+
+        $this->rbXY = new XmpImageRegionPoint(
+            self::getNodeValue($xpath, "$xpathToRb/Iptc4xmpExt:rbX", $node),
+            self::getNodeValue($xpath, "$xpathToRb/Iptc4xmpExt:rbY", $node)
+        );
+
+        $verticesNodes = $xpath->query(
+            "$xpathToRb/Iptc4xmpExt:rbVertices/rdf:Seq/rdf:li",
+            $node
+        );
+        if ($verticesNodes->length) {
+            $this->rbVertices = [];
+            foreach ($verticesNodes as $verticesNode) {
+                $point = new XmpImageRegionPoint(
+                    self::getNodeValue($xpath, "Iptc4xmpExt:rbX", $verticesNode),
+                    self::getNodeValue($xpath, "Iptc4xmpExt:rbY", $verticesNode)
+                );
+                array_push($this->rbVertices, $point);
+            }
+        }
+    }
+
+    /**
+     * @param \DOMXPath $xpath
+     * @param string $expression XPath expression leading to one single node.
+     * @param \DOMNode $contextNode
+     *
+     * @return string|null
+     */
+    private static function getNodeValue($xpath, $expression, $contextNode) {
+        $node = $xpath->query($expression, $contextNode)->item(0);
+        return $node ? $node->nodeValue : null;
+    }
+
+    /**
+     * @param \DOMXPath $xpath
+     * @param string $expression XPath expression leading to several nodes.
+     * @param \DOMNode $contextNode
+     *
+     * @return array|null
+     */
+    private static function getNodeValues($xpath, $expression, $contextNode) {
+        $nodes = $xpath->query($expression, $contextNode);
+        if (!$nodes->length) {
+            return null;
+        }
+
+        $result = [];
+        foreach ($nodes as $node) {
+            array_push($result, $node->nodeValue);
+        }
+        return $result;
+    }
+
+    /**
+     * See https://iptc.org/std/photometadata/specification/IPTC-PhotoMetadata#entity-or-concept-structure
+     *
+     * @param \DOMXPath $xpath
+     * @param string $expression XPath expression leading to the parent of an
+     *                           <rdf:Bag> of an Identity or Concept structure.
+     * @param \DOMNode $contextNode
+     *
+     * @return array|null
+     */
+    private static function getEntityOrConceptValues(
+        $xpath,
+        $expression,
+        $contextNode
+    ) {
+        $names = self::getNodeValues(
+            $xpath,
+            "$expression/rdf:Bag/rdf:li/Iptc4xmpExt:Name/rdf:Alt/rdf:li",
+            $contextNode
+        );
+        $identifiers = self::getNodeValues(
+            $xpath,
+            "$expression/rdf:Bag/rdf:li/xmp:Identifier/rdf:Bag/rdf:li",
+            $contextNode
+        );
+
+        if (!$names) {
+            return $identifiers;
+        }
+        if (!$identifiers) {
+            return $names;
+        }
+        return array_merge($names, $identifiers);
+    }
+}
+
+/**
+ * (X, Y) pair of coordinates.
+ */
+class XmpImageRegionPoint
+{
+    /**
+     * @var string|null
+     */
+    private $rbX;
+
+    /**
+     * @var string|null
+     */
+    private $rbY;
+
+    public function __construct($x, $y)
+    {
+        $this->rbX = $x;
+        $this->rbY = $y;
     }
 }

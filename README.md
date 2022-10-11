@@ -1,8 +1,29 @@
 Image metadata library (PHP 5.5+)
 =========
-[![Build Status](https://travis-ci.org/dchesterton/image.svg?branch=master)](https://travis-ci.org/dchesterton/image) [![Dependency Status](https://www.versioneye.com/user/projects/5494283bdd709d811f0004df/badge.svg?style=flat)](https://www.versioneye.com/user/projects/5494283bdd709d811f0004df)
 
-[![Latest Stable Version](https://poser.pugx.org/dchesterton/image/v/stable.svg)](https://packagist.org/packages/dchesterton/image) [![Total Downloads](https://poser.pugx.org/dchesterton/image/downloads.svg)](https://packagist.org/packages/dchesterton/image) [![Latest Unstable Version](https://poser.pugx.org/dchesterton/image/v/unstable.svg)](https://packagist.org/packages/dchesterton/image) [![License](https://poser.pugx.org/dchesterton/image/license.svg)](https://packagist.org/packages/dchesterton/image)
+> **NOTE**: this fork of [dchesterton/image](https://github.com/dchesterton/image)
+> adds the following changes:
+>
+> * added `Xmp::getImageRegions()`,
+> * unit tests made runnable on PHP8.
+>
+> Pull it via [Composer](https://getcomposer.org/) with the following
+> `composer.json`:
+>
+> ```json
+> {
+>   "minimum-stability": "dev",
+>   "repositories": [
+>     {
+>       "type": "vcs",
+>       "url": "https://github.com/AurelienLourot/image.git"
+>     }
+>   ],
+>   "require": {
+>     "dchesterton/image": "dev-master"
+>   }
+> }
+> ```
 
 ## Warning: This library is pre-alpha and much of it is a WIP or simply not working at all. Proceed at your own risk.
 
@@ -16,7 +37,7 @@ Supported image types:
    - ~~TIFF~~
    - ~~DNG~~
    - ~~RAW FORMATS~~
-   	- ~~CR2, NEF, etc.~~
+   - ~~CR2, NEF, etc.~~
 
 Supported image meta types:
    - XMP
