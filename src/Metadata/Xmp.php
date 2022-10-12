@@ -1435,6 +1435,17 @@ class Xmp
             $imageRegion = new XmpImageRegion($this->xpath, $imageRegionItem);
             array_push($results, $imageRegion);
         }
+
+        $results = array_filter(
+            $results,
+            function($element) use($shapeFilter, $roleFilter) {
+                return (
+                    $element->matchesShapeFilter($shapeFilter) &&
+                    $element->matchesRoleFilter($roleFilter)
+                );
+            }
+        );
+
         return $results;
     }
 
@@ -1467,9 +1478,9 @@ abstract class XmpShapeFilter
     public static function getXmlRbShape($value)
     {
         switch ($value) {
-            case RECTANGLE:
-            case CIRCLE:
-            case POLYGON:
+            case self::RECTANGLE:
+            case self::CIRCLE:
+            case self::POLYGON:
                 return $value;
         }
         throw new UnsupportedException('Unsupported region shape');
@@ -1494,7 +1505,7 @@ abstract class XmpRoleFilter
     public static function getMatchingRoleNames($value)
     {
         switch ($value) {
-            case CROP:
+            case self::CROP:
                 // See https://cv.iptc.org/newscodes/imageregionrole/
                 return [
                     'cropping',
@@ -1664,6 +1675,27 @@ class XmpImageRegion
                 array_push($this->rbVertices, $point);
             }
         }
+    }
+
+    /**
+     * @param string $filter One of the XmpShapeFilter constants.
+     *
+     * @return bool
+     */
+    public function matchesShapeFilter($filter) {
+        return (
+            $filter === XmpShapeFilter::ANY ||
+            XmpShapeFilter::getXmlRbShape($filter) === $this->rbShape
+        );
+    }
+
+    /**
+     * @param string $filter One of the XmpRoleFilter constants.
+     *
+     * @return bool
+     */
+    public function matchesRoleFilter($filter) {
+        return true;
     }
 
     /**
