@@ -1540,71 +1540,71 @@ class XmpImageRegion
     /**
      * @var string|null
      */
-    private $id;
+    public $id;
 
     /**
      * @var array|null
      */
-    private $names;
+    public $names;
 
     /**
      * @var array|null
      */
-    private $types;
+    public $types;
 
     /**
      * @var array|null
      */
-    private $roles;
+    public $roles;
 
     /**
      * 'rectangle', 'circle' or 'polygon'.
      *
      * @var string|null
      */
-    private $rbShape;
+    public $rbShape;
 
     /**
      * E.g. 'relative'.
      *
      * @var string|null
      */
-    private $rbUnit;
+    public $rbUnit;
 
     /**
      * Rectangle or circle's coordinates.
      *
      * @var XmpImageRegionPoint
      */
-    private $rbXY;
+    public $rbXY;
 
     /**
      * Rectangle's height.
      *
      * @var string|null
      */
-    private $rbH;
+    public $rbH;
 
     /**
      * Rectangle's width.
      *
      * @var string|null
      */
-    private $rbW;
+    public $rbW;
 
     /**
      * Circle's radius.
      *
      * @var string|null
      */
-    private $rbRx;
+    public $rbRx;
 
     /**
      * Polygon's vertices.
      *
      * @var array|null
      */
-    private $rbVertices;
+    public $rbVertices;
 
     /**
      * @param \DOMXPath $xpath
@@ -1742,12 +1742,12 @@ class XmpImageRegionPoint
     /**
      * @var string|null
      */
-    private $rbX;
+    public $rbX;
 
     /**
      * @var string|null
      */
-    private $rbY;
+    public $rbY;
 
     public function __construct($x, $y)
     {
