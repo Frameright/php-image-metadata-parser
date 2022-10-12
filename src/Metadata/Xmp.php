@@ -1409,12 +1409,6 @@ class Xmp
         $shapeFilter = XmpShapeFilter::ANY,
         $roleFilter = XmpRoleFilter::ANY)
     {
-        if ($roleFilter !== XmpRoleFilter::ANY) {
-            throw new UnsupportedException(
-                'Role filters not supported yet'
-            );
-        }
-
         $imageRegionNode = $this->getNode(
             'Iptc4xmpExt:ImageRegion',
             self::IPTC4_XMP_EXT_NS,
@@ -1498,11 +1492,12 @@ abstract class XmpRoleFilter
     /**
      * @param string $value CROP.
      *
-     * @return array The list of <Iptc4xmpExt:rRole><Iptc4xmpExt:Name> values
+     * @return array The list of <Iptc4xmpExt:rRole><Iptc4xmpExt:Name> or
+     *               <Iptc4xmpExt:rRole><Iptc4xmpExt:Identifier> values
      *               that would match the filter.
      * @throws UnsupportedException
      */
-    public static function getMatchingRoleNames($value)
+    public static function getMatchingXmlRoles($value)
     {
         switch ($value) {
             case self::CROP:
@@ -1513,24 +1508,6 @@ abstract class XmpRoleFilter
                     'landscape format cropping',
                     'portrait format cropping',
                     'square format cropping',
-                ];
-        }
-        throw new UnsupportedException('Unsupported region role filter');
-    }
-
-    /**
-     * @param string $value CROP.
-     *
-     * @return array The list of <Iptc4xmpExt:rRole><Iptc4xmpExt:Identifier>
-     *               values that would match the filter.
-     * @throws UnsupportedException
-     */
-    public static function getMatchingRoleURIs($value)
-    {
-        switch ($value) {
-            case CROP:
-                // See https://cv.iptc.org/newscodes/imageregionrole/
-                return [
                     'http://cv.iptc.org/newscodes/imageregionrole/cropping',
                     'http://cv.iptc.org/newscodes/imageregionrole/recomCropping',
                     'http://cv.iptc.org/newscodes/imageregionrole/landscapeCropping',
@@ -1695,7 +1672,13 @@ class XmpImageRegion
      * @return bool
      */
     public function matchesRoleFilter($filter) {
-        return true;
+        return (
+            $filter === XmpRoleFilter::ANY ||
+            count(array_intersect(
+                XmpRoleFilter::getMatchingXmlRoles($filter),
+                $this->roles
+            )) > 0
+        );
     }
 
     /**
