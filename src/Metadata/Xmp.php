@@ -1457,10 +1457,10 @@ class Xmp
  */
 abstract class XmpShapeFilter
 {
-    public const ANY = '';
-    public const RECTANGLE = 'rectangle';
-    public const CIRCLE = 'circle';
-    public const POLYGON = 'polygon';
+    const ANY = '';
+    const RECTANGLE = 'rectangle';
+    const CIRCLE = 'circle';
+    const POLYGON = 'polygon';
 
     /**
      * @param string $value RECTANGLE, CIRCLE or POLYGON.
@@ -1486,8 +1486,8 @@ abstract class XmpShapeFilter
  */
 abstract class XmpRoleFilter
 {
-    public const ANY = '';
-    public const CROP = 'crop';
+    const ANY = '';
+    const CROP = 'crop';
 
     /**
      * @param string $value CROP.

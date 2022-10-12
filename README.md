@@ -5,10 +5,20 @@ Image metadata library (PHP 5.5+)
 > adds the following changes:
 >
 > * added `Xmp::getImageRegions()`,
-> * unit tests made runnable on PHP8.
+> * unit tests made runnable on PHP8,
+> * added linter to validate code against any version of PHP >= 5.5 .
 >
-> Pull it via [Composer](https://getcomposer.org/) with the following
-> `composer.json`:
+> Run the linter and the unit tests with: (see also
+> https://github.com/AurelienLourot/image/issues/4 )
+>
+> ```bash
+> $ composer install
+> $ composer lint
+> $ composer test
+> ```
+>
+> Pull the library in your project  via [Composer](https://getcomposer.org/)
+> with the following `composer.json`:
 >
 > ```json
 > {

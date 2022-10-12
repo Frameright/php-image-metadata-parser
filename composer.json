@@ -19,9 +19,11 @@
     },
     "require-dev": {
         "mockery/mockery": "~0.9",
-        "phpunit/phpunit": "^9.5.25"
+        "phpunit/phpunit": "^9.5.25",
+        "phpcompatibility/php-compatibility": "^9.3.5"
     },
     "scripts": {
+        "lint": "./vendor/bin/phpcs",
         "test": "./vendor/bin/phpunit"
     }
 }
