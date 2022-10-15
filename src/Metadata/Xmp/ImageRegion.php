@@ -81,11 +81,19 @@ class ImageRegion
     public $rbVertices;
 
     /**
-     * @param \DOMXPath $xpath
-     * @param \DOMNode $node <rdf:li> node.
+     * Initialize members if a node is provided.
+     *
+     * @param \DOMXPath|null $xpath
+     * @param \DOMNode|null $node <rdf:li> node.
      */
-    public function __construct($xpath, $node)
+    public function __construct($xpath = null, $node = null)
     {
+        if (!$xpath || !$node) {
+            // A test case probably wants to forge manually an instance of this
+            // class.
+            return;
+        }
+
         $this->id = self::getNodeValue($xpath, 'Iptc4xmpExt:rId', $node);
         $this->names = self::getNodeValues(
             $xpath,
