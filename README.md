@@ -9,7 +9,7 @@ Image metadata library (PHP 5.5+)
 > * added linter to validate code against any version of PHP >= 5.5 .
 >
 > Run the linter and the unit tests with: (see also
-> https://github.com/AurelienLourot/image/issues/4 )
+> https://github.com/Frameright/image/issues/4 )
 >
 > ```bash
 > $ composer install
@@ -26,7 +26,7 @@ Image metadata library (PHP 5.5+)
 >   "repositories": [
 >     {
 >       "type": "vcs",
->       "url": "https://github.com/AurelienLourot/image.git"
+>       "url": "https://github.com/Frameright/image.git"
 >     }
 >   ],
 >   "require": {
