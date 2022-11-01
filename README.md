@@ -35,6 +35,8 @@ Image metadata library (PHP 5.5+)
 >   }
 > }
 > ```
+>
+> **Dependencies**: [`php-xml`](https://www.php.net/manual/en/book.dom.php)
 
 ## Warning: This library is pre-alpha and much of it is a WIP or simply not working at all. Proceed at your own risk.
 
