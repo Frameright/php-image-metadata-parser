@@ -1,0 +1,62 @@
+name: validate-on-push
+on: [push]
+jobs:
+  linter:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: php-actions/composer@v6
+        with:
+          php_version: '8.1'
+      - uses: php-actions/composer@v6
+        with:
+          php_version: '8.1'
+          command: lint
+
+  unit-tests-php73:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: php-actions/composer@v6
+        with:
+          php_version: '7.3'
+      - uses: php-actions/composer@v6
+        with:
+          php_version: '7.3'
+          command: test
+
+  unit-tests-php74:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: php-actions/composer@v6
+        with:
+          php_version: '7.4'
+      - uses: php-actions/composer@v6
+        with:
+          php_version: '7.4'
+          command: test
+
+  unit-tests-php80:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: php-actions/composer@v6
+        with:
+          php_version: '8.0'
+      - uses: php-actions/composer@v6
+        with:
+          php_version: '8.0'
+          command: test
+
+  unit-tests-php81:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: php-actions/composer@v6
+        with:
+          php_version: '8.1'
+      - uses: php-actions/composer@v6
+        with:
+          php_version: '8.1'
+          command: test
