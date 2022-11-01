@@ -147,12 +147,10 @@ class AggregateTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($aggregate, $return);
     }
 
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Priority can only contain xmp, iptc or exif
-     */
     public function testInvalidPriority()
     {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Priority can only contain xmp, iptc or exif');
         $reader = new Aggregate;
         $reader->setPriority(['test']);
     }

@@ -81,11 +81,11 @@ class AbstractImageTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @covers ::save
-     * @expectedException \Exception
-     * @expectedExceptionMessage Must provide a filename
      */
     public function testSaveWithNoFilename()
     {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Must provide a filename');
         $image = $this->getMockForAbstractImage();
         $image->save();
     }

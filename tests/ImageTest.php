@@ -51,11 +51,11 @@ class ImageTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @covers ::fromFile
-     * @expectedException \Exception
-     * @expectedExceptionMessage Unrecognised file name
      */
     public function testInvalidFile()
     {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Unrecognised file name');
         Image::fromFile(__FILE__);
     }
 }

@@ -15,13 +15,12 @@ class PNGTest extends \PHPUnit\Framework\TestCase
     /**
      * Test that a non-PNG file throws an exception.
      *
-     * @expectedException \Exception
-     * @expectedExceptionMessage Invalid PNG file signature
-     *
      * @covers ::fromFile
      */
     public function testFromFileInvalidPNG()
     {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Invalid PNG file signature');
         PNG::fromFile(__DIR__ . '/../Fixtures/nometa.jpg');
     }
 
@@ -86,13 +85,12 @@ class PNGTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Invalid CRC for chunk with type: IHDR
-     *
      * @covers ::getChunksFromContents
      */
     public function testFromFileWithMalformedChunks()
     {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Invalid CRC for chunk with type: IHDR');
         PNG::fromFile(__DIR__ . '/../Fixtures/malformedchunks.png');
     }
 
@@ -163,25 +161,23 @@ class PNGTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @expectedException \CSD\Image\Metadata\UnsupportedException
-     * @expectedExceptionMessage PNG files do not support EXIF metadata
-     *
      * @covers ::getExif
      */
     public function testGetExif()
     {
+        $this->expectException(\CSD\Image\Metadata\UnsupportedException::class);
+        $this->expectExceptionMessage('PNG files do not support EXIF metadata');
         $png = PNG::fromFile(__DIR__ . '/../Fixtures/nometa.png');
         $png->getExif();
     }
 
     /**
-     * @expectedException \CSD\Image\Metadata\UnsupportedException
-     * @expectedExceptionMessage PNG files do not support IPTC metadata
-     *
      * @covers ::getIptc
      */
     public function testGetIptc()
     {
+        $this->expectException(\CSD\Image\Metadata\UnsupportedException::class);
+        $this->expectExceptionMessage('PNG files do not support IPTC metadata');
         $png = PNG::fromFile(__DIR__ . '/../Fixtures/nometa.png');
         $png->getIptc();
     }
