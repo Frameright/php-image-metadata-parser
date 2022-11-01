@@ -5,6 +5,7 @@ Image metadata library (PHP 5.5+)
 > adds the following changes:
 >
 > * added `Xmp::getImageRegions()`,
+> * fixed WebP header generation,
 > * unit tests made runnable on PHP8 and newer PHPUnit,
 > * added linter to validate code against any version of PHP >= 5.5 .
 >

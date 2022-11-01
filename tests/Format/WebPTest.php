@@ -94,6 +94,6 @@ class WebPTest extends \PHPUnit\Framework\TestCase
         $webp = WebP::fromFile(__DIR__ . '/../Fixtures/simple.webp');
         $webp->setXmp($xmp);
 
-        var_dump($webp->getBytes());
+        // var_dump($webp->getBytes());
     }
 }
