@@ -1,5 +1,7 @@
 /tests             export-ignore
 /.gitattributes    export-ignore
+/.github           export-ignore
 /.gitignore        export-ignore
 /phpunit.xml.dist  export-ignore
+/phpcs.xml         export-ignore
 /autoload.php.dist export-ignore
