@@ -65,15 +65,4 @@ class Chunk
 
         return $this->type . pack('V', $length) . $data;
     }
-
-    /**
-     * @param string $data
-     *
-     * @return $this
-     */
-    public function setData($data)
-    {
-        $this->data = $data;
-        return $this;
-    }
 }

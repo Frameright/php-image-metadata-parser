@@ -114,45 +114,11 @@ class Aggregate
     }
 
     /**
-     * @param $field
-     * @param $value
-     *
-     * @return $this
-     */
-    private function set($field, $value)
-    {
-        $supported = $this->fields[$field];
-
-        foreach ($supported as $metaType) {
-            $metaObject = $this->$metaType;
-
-            if (!$metaObject) {
-                continue;
-            }
-
-            $setter = 'set' . ucfirst($field);
-            $metaObject->$setter($value);
-        }
-
-        return $this;
-    }
-
-    /**
      * @return string|null
      */
     public function getHeadline()
     {
         return $this->get('headline');
-    }
-
-    /**
-     * @param string $headline
-     *
-     * @return $this
-     */
-    public function setHeadline($headline)
-    {
-        return $this->set('headline', $headline);
     }
 
     /**
@@ -164,31 +130,11 @@ class Aggregate
     }
 
     /**
-     * @param string $caption
-     *
-     * @return $this
-     */
-    public function setCaption($caption)
-    {
-        return $this->set('caption', $caption);
-    }
-
-    /**
      * @return string|null
      */
     public function getLocation()
     {
         return $this->get('location');
-    }
-
-    /**
-     * @param string $location
-     *
-     * @return $this
-     */
-    public function setLocation($location)
-    {
-        return $this->set('location', $location);
     }
 
     /**
@@ -200,31 +146,11 @@ class Aggregate
     }
 
     /**
-     * @param string $city
-     *
-     * @return $this
-     */
-    public function setCity($city)
-    {
-        return $this->set('city', $city);
-    }
-
-    /**
      * @return string|null
      */
     public function getState()
     {
         return $this->get('state');
-    }
-
-    /**
-     * @param string $state
-     *
-     * @return $this
-     */
-    public function setState($state)
-    {
-        return $this->set('state', $state);
     }
 
     /**
@@ -236,31 +162,11 @@ class Aggregate
     }
 
     /**
-     * @param string $country
-     *
-     * @return $this
-     */
-    public function setCountry($country)
-    {
-        return $this->set('country', $country);
-    }
-
-    /**
      * @return string|null
      */
     public function getCountryCode()
     {
         return $this->get('countryCode');
-    }
-
-    /**
-     * @param string $countryCode
-     *
-     * @return $this
-     */
-    public function setCountryCode($countryCode)
-    {
-        return $this->set('countryCode', $countryCode);
     }
 
     /**
@@ -272,31 +178,11 @@ class Aggregate
     }
 
     /**
-     * @param string $photographerName
-     *
-     * @return $this
-     */
-    public function setPhotographerName($photographerName)
-    {
-        return $this->set('photographerName', $photographerName);
-    }
-
-    /**
      * @return string|null
      */
     public function getCredit()
     {
         return $this->get('credit');
-    }
-
-    /**
-     * @param string $credit
-     *
-     * @return $this
-     */
-    public function setCredit($credit)
-    {
-        return $this->set('credit', $credit);
     }
 
     /**
@@ -308,31 +194,11 @@ class Aggregate
     }
 
     /**
-     * @param string $photographerTitle
-     *
-     * @return $this
-     */
-    public function setPhotographerTitle($photographerTitle)
-    {
-        return $this->set('photographerTitle', $photographerTitle);
-    }
-
-    /**
      * @return string|null
      */
     public function getSource()
     {
         return $this->get('source');
-    }
-
-    /**
-     * @param string $source
-     *
-     * @return $this
-     */
-    public function setSource($source)
-    {
-        return $this->set('source', $source);
     }
 
     /**
@@ -344,31 +210,11 @@ class Aggregate
     }
 
     /**
-     * @param string $copyright
-     *
-     * @return $this
-     */
-    public function setCopyright($copyright)
-    {
-        return $this->set('copyright', $copyright);
-    }
-
-    /**
      * @return string|null
      */
     public function getObjectName()
     {
         return $this->get('objectName');
-    }
-
-    /**
-     * @param string $objectName
-     *
-     * @return $this
-     */
-    public function setObjectName($objectName)
-    {
-        return $this->set('objectName', $objectName);
     }
 
     /**
@@ -380,31 +226,11 @@ class Aggregate
     }
 
     /**
-     * @param string $captionWriters
-     *
-     * @return $this
-     */
-    public function setCaptionWriters($captionWriters)
-    {
-        return $this->set('captionWriters', $captionWriters);
-    }
-
-    /**
      * @return string|null
      */
     public function getInstructions()
     {
         return $this->get('instructions');
-    }
-
-    /**
-     * @param string $instructions
-     *
-     * @return $this
-     */
-    public function setInstructions($instructions)
-    {
-        return $this->set('instructions', $instructions);
     }
 
     /**
@@ -416,31 +242,11 @@ class Aggregate
     }
 
     /**
-     * @param string $category
-     *
-     * @return $this
-     */
-    public function setCategory($category)
-    {
-        return $this->set('category', $category);
-    }
-
-    /**
      * @return string|null
      */
     public function getSupplementalCategories()
     {
         return $this->get('supplementalCategories');
-    }
-
-    /**
-     * @param string $supplementalCategories
-     *
-     * @return $this
-     */
-    public function setSupplementalCategories($supplementalCategories)
-    {
-        return $this->set('supplementalCategories', $supplementalCategories);
     }
 
     /**
@@ -452,31 +258,11 @@ class Aggregate
     }
 
     /**
-     * @param string $transmissionReference
-     *
-     * @return $this
-     */
-    public function setTransmissionReference($transmissionReference)
-    {
-        return $this->set('transmissionReference', $transmissionReference);
-    }
-
-    /**
      * @return string|null
      */
     public function getUrgency()
     {
         return $this->get('urgency');
-    }
-
-    /**
-     * @param string $urgency
-     *
-     * @return $this
-     */
-    public function setUrgency($urgency)
-    {
-        return $this->set('urgency', $urgency);
     }
 
     /**
@@ -488,30 +274,10 @@ class Aggregate
     }
 
     /**
-     * @param mixed $keywords
-     *
-     * @return $this
-     */
-    public function setKeywords($keywords)
-    {
-        return $this->set('keywords', $keywords);
-    }
-
-    /**
      * @return \DateTime|null
      */
     public function getDateCreated()
     {
         return $this->get('dateCreated');
-    }
-
-    /**
-     * @param \DateTime $dateCreated
-     *
-     * @return $this
-     */
-    public function setDateCreated(\DateTime $dateCreated)
-    {
-        return $this->set('dateCreated', $dateCreated);
     }
 }

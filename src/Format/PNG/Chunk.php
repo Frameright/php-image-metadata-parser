@@ -68,15 +68,4 @@ class Chunk
 
         return hex2bin($hex);
     }
-
-    /**
-     * @param string $data
-     *
-     * @return $this
-     */
-    public function setData($data)
-    {
-        $this->data = $data;
-        return $this;
-    }
 }

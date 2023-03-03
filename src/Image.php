@@ -14,22 +14,6 @@ use CSD\Image\Metadata\UnsupportedException;
 abstract class Image implements ImageInterface
 {
     /**
-     * @var string
-     */
-    protected $filename;
-
-    /**
-     * @param string $filename
-     *
-     * @return $this
-     */
-    public function setFilename($filename)
-    {
-        $this->filename = $filename;
-        return $this;
-    }
-
-    /**
      * @return Aggregate
      */
     public function getAggregate()
@@ -53,20 +37,6 @@ abstract class Image implements ImageInterface
         }
 
         return new Aggregate($xmp, $iptc, $exif);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function save($filename = null)
-    {
-        $filename = $filename ?: $this->filename;
-
-        if (!$filename) {
-            throw new \Exception('Must provide a filename');
-        }
-
-        file_put_contents($filename, $this->getBytes());
     }
 
     /**

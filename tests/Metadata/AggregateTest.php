@@ -111,42 +111,6 @@ class AggregateTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($reader->$getter());
     }
 
-    /**
-     * @dataProvider getXmpAndIptcFields
-     */
-    public function testSetXmpIptcField($field)
-    {
-        $method = 'set' . ucfirst($field);
-        $value = ($field == 'dateCreated')? new \DateTime: 'value';
-
-        $xmp = M::mock(Xmp::class);
-        $xmp->shouldReceive($method)->once()->with($value);
-
-        $iptc = M::mock(Iptc::class);
-        $iptc->shouldReceive($method)->once()->with($value);
-
-        $aggregate = new Aggregate($xmp, $iptc);
-
-        $return = $aggregate->$method($value);
-
-        $this->assertSame($aggregate, $return);
-    }
-
-    /**
-     * @dataProvider getXmpAndIptcFields
-     */
-    public function testSetXmpIptcFieldWhenNoProviders($field)
-    {
-        $method = 'set' . ucfirst($field);
-        $value = ($field == 'dateCreated')? new \DateTime: 'value';
-
-        $aggregate = new Aggregate;
-
-        $return = $aggregate->$method($value);
-
-        $this->assertSame($aggregate, $return);
-    }
-
     public function testInvalidPriority()
     {
         $this->expectException(\Exception::class);

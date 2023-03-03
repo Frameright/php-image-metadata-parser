@@ -68,11 +68,6 @@ class Xmp
     private $about = '';
 
     /**
-     * @var bool
-     */
-    private $hasChanges = false;
-
-    /**
      * The XMP namespaces used by this class.
      *
      * @var array
@@ -154,26 +149,6 @@ class Xmp
     public static function fromFile($fileName)
     {
         return new self(file_get_contents($fileName));
-    }
-
-    /**
-     * @param $array
-     *
-     * @return Xmp
-     */
-    public static function fromArray($array)
-    {
-        $xmp = new self;
-
-        foreach ($array as $field => $value) {
-            $setter = 'set' . ucfirst($field);
-
-            if (method_exists($xmp, $setter) && null !== $value) {
-                $xmp->$setter($value);
-            }
-        }
-
-        return $xmp;
     }
 
     /**
@@ -288,89 +263,6 @@ class Xmp
     }
 
     /**
-     * @param $field
-     * @param $value
-     * @param $ns
-     *
-     * @return $this
-     */
-    private function setAttr($field, $value, $ns)
-    {
-        // check if this already exists first
-        $existingNode = $this->getNode($field, $ns);
-
-        if ($existingNode) {
-            if (null === $value) {
-                /** @var $desc \DOMElement */
-                $desc = $existingNode->parentNode;
-
-                if ($existingNode instanceof \DOMAttr) {
-                    $desc->removeAttributeNode($existingNode);
-                } else {
-                    $desc->removeChild($existingNode);
-                }
-            } else {
-                $existingNode->nodeValue = $value;
-            }
-        } else {
-            // create new attribute
-            $this->getOrCreateRDFDescription($ns)->setAttributeNS($ns, $field, $value);
-        }
-
-        $this->hasChanges = true;
-
-        return $this;
-    }
-
-    /**
-     * @param $field
-     * @param $value
-     *
-     * @return $this
-     */
-    private function setContactAttr($field, $value)
-    {
-        $contactNode = $this->xpath->query('//Iptc4xmpCore:CreatorContactInfo');
-
-        if ($contactNode->length) {
-            $parent = $contactNode->item(0);
-        } else {
-            $parent = $this->dom->createElementNS(self::IPTC4_XMP_CORE_NS, 'Iptc4xmpCore:CreatorContactInfo');
-            $this->getOrCreateRDFDescription(self::IPTC4_XMP_CORE_NS)->appendChild($parent);
-        }
-
-        // try and find child element first
-        $childElement = false;
-
-        /** @var $child \DOMNode */
-        foreach ($parent->childNodes as $child) {
-            if ($child->nodeName == $field) {
-                $childElement = $child;
-                break;
-            }
-        }
-
-        if (null === $value) {
-            if ($childElement) {
-                $childElement->parentNode->removeChild($childElement);
-            } elseif ($parent->hasAttribute($field)) {
-                $parent->removeAttribute($field);
-            }
-        } else {
-            if ($childElement) {
-                $childElement->nodeValue = $value;
-            } else {
-                // if we do not have an element, set it as an attribute (preferred way)
-                $parent->setAttribute($field, $value);
-            }
-        }
-
-        $this->hasChanges = true;
-
-        return $this;
-    }
-
-    /**
      * @param $namespace
      *
      * @return \DOMNode|null
@@ -434,112 +326,11 @@ class Xmp
     }
 
     /**
-     * @param $field
-     * @param $value
-     * @param $ns
-     *
-     * @return $this
-     */
-    private function setBag($field, $value, $ns)
-    {
-        return $this->setList($field, $value, 'rdf:Bag', $ns);
-    }
-
-    /**
-     * @param $field
-     * @param $value
-     * @param $ns
-     *
-     * @return $this
-     */
-    private function setAlt($field, $value, $ns)
-    {
-        return $this->setList($field, $value, 'rdf:Alt', $ns);
-    }
-
-    /**
-     * @param $field
-     * @param $value
-     * @param $ns
-     *
-     * @return $this
-     */
-    private function setSeq($field, $value, $ns)
-    {
-        return $this->setList($field, $value, 'rdf:Seq', $ns);
-    }
-
-    /**
-     * @param $field
-     * @param $value
-     * @param $type
-     * @param $ns
-     *
-     * @return $this
-     */
-    private function setList($field, $value, $type, $ns)
-    {
-        $result = $this->xpath->query('//rdf:Description/' . $field . '/' . $type . '/rdf:li');
-        $parent = null;
-
-        if ($result->length) {
-            $parent = $result->item(0)->parentNode;
-
-            // remove child nodes
-            for ($i = 0; $i < $result->length; $i++) {
-                $parent->removeChild($result->item($i));
-            }
-        } else {
-            // find the RDF description root
-            $description = $this->getOrCreateRDFDescription($ns);
-
-            // create the element and the rdf:Alt child
-            $node = $this->dom->createElementNS($ns, $field);
-            $parent = $this->dom->createElementNS(self::RDF_NS, $type);
-
-            $description->appendChild($node);
-            $node->appendChild($parent);
-        }
-
-        if (!$value || (is_array($value) && count($value) === 0)) {
-            // remove element
-            $parent->parentNode->parentNode->removeChild($parent->parentNode);
-        } else {
-            foreach ((array) $value as $item) {
-                $node = $this->dom->createElementNS(self::RDF_NS, 'rdf:li');
-                $node->appendChild($this->dom->createTextNode($item));
-
-                if ($type == 'rdf:Alt') {
-                    $node->setAttribute('xml:lang', 'x-default');
-                }
-
-                $parent->appendChild($node);
-            }
-        }
-
-        $this->hasChanges = true;
-
-        return $this;
-    }
-
-    /**
      * @return string
      */
     public function getHeadline()
     {
         return $this->getAttr('photoshop:Headline', self::PHOTOSHOP_NS);
-    }
-
-    /**
-     * Set headline.
-     *
-     * @param $headline string
-     *
-     * @return $this
-     */
-    public function setHeadline($headline)
-    {
-        return $this->setAttr('photoshop:Headline', $headline, self::PHOTOSHOP_NS);
     }
 
     /**
@@ -551,31 +342,11 @@ class Xmp
     }
 
     /**
-     * @param $caption string
-     *
-     * @return $this
-     */
-    public function setCaption($caption)
-    {
-        return $this->setAlt('dc:description', $caption, self::DC_NS);
-    }
-
-    /**
      * @return string
      */
     public function getEvent()
     {
         return $this->getAttr('Iptc4xmpExt:Event', self::IPTC4_XMP_EXT_NS);
-    }
-
-    /**
-     * @param $event string
-     *
-     * @return $this
-     */
-    public function setEvent($event)
-    {
-        return $this->setAttr('Iptc4xmpExt:Event', $event, self::IPTC4_XMP_EXT_NS);
     }
 
     /**
@@ -587,31 +358,11 @@ class Xmp
     }
 
     /**
-     * @param $location string
-     *
-     * @return $this
-     */
-    public function setLocation($location)
-    {
-        return $this->setAttr('Iptc4xmpCore:Location', $location, self::IPTC4_XMP_CORE_NS);
-    }
-
-    /**
      * @return string
      */
     public function getCity()
     {
         return $this->getAttr('photoshop:City', self::PHOTOSHOP_NS);
-    }
-
-    /**
-     * @param $city string
-     *
-     * @return $this
-     */
-    public function setCity($city)
-    {
-        return $this->setAttr('photoshop:City', $city, self::PHOTOSHOP_NS);
     }
 
     /**
@@ -623,31 +374,11 @@ class Xmp
     }
 
     /**
-     * @param $state string
-     *
-     * @return $this
-     */
-    public function setState($state)
-    {
-        return $this->setAttr('photoshop:State', $state, self::PHOTOSHOP_NS);
-    }
-
-    /**
      * @return string
      */
     public function getCountry()
     {
         return $this->getAttr('photoshop:Country', self::PHOTOSHOP_NS);
-    }
-
-    /**
-     * @param $country string
-     *
-     * @return $this
-     */
-    public function setCountry($country)
-    {
-        return $this->setAttr('photoshop:Country', $country, self::PHOTOSHOP_NS);
     }
 
     /**
@@ -659,31 +390,11 @@ class Xmp
     }
 
     /**
-     * @param $countryCode string
-     *
-     * @return $this
-     */
-    public function setCountryCode($countryCode)
-    {
-        return $this->setAttr('Iptc4xmpCore:CountryCode', $countryCode, self::IPTC4_XMP_CORE_NS);
-    }
-
-    /**
      * @return array
      */
     public function getIPTCSubjectCodes()
     {
         return $this->getBag('Iptc4xmpCore:SubjectCode', self::IPTC4_XMP_CORE_NS);
-    }
-
-    /**
-     * @param $subjectCodes array
-     *
-     * @return $this
-     */
-    public function setIPTCSubjectCodes($subjectCodes)
-    {
-        return $this->setBag('Iptc4xmpCore:SubjectCode', $subjectCodes, self::IPTC4_XMP_CORE_NS);
     }
 
     /**
@@ -702,31 +413,11 @@ class Xmp
     }
 
     /**
-     * @param $photographerName string
-     *
-     * @return $this
-     */
-    public function setPhotographerName($photographerName)
-    {
-        return $this->setSeq('dc:creator', $photographerName, self::DC_NS);
-    }
-
-    /**
      * @return string
      */
     public function getCredit()
     {
         return $this->getAttr('photoshop:Credit', self::PHOTOSHOP_NS);
-    }
-
-    /**
-     * @param $credit string
-     *
-     * @return $this
-     */
-    public function setCredit($credit)
-    {
-        return $this->setAttr('photoshop:Credit', $credit, self::PHOTOSHOP_NS);
     }
 
     /**
@@ -738,31 +429,11 @@ class Xmp
     }
 
     /**
-     * @param $photographerTitle string
-     *
-     * @return $this
-     */
-    public function setPhotographerTitle($photographerTitle)
-    {
-        return $this->setAttr('photoshop:AuthorsPosition', $photographerTitle, self::PHOTOSHOP_NS);
-    }
-
-    /**
      * @return string
      */
     public function getSource()
     {
         return $this->getAttr('photoshop:Source', self::PHOTOSHOP_NS);
-    }
-
-    /**
-     * @param $source string
-     *
-     * @return $this
-     */
-    public function setSource($source)
-    {
-        return $this->setAttr('photoshop:Source', $source, self::PHOTOSHOP_NS);
     }
 
     /**
@@ -774,31 +445,11 @@ class Xmp
     }
 
     /**
-     * @param $copyright string
-     *
-     * @return $this
-     */
-    public function setCopyright($copyright)
-    {
-        return $this->setAlt('dc:rights', $copyright, self::DC_NS);
-    }
-
-    /**
      * @return string
      */
     public function getCopyrightUrl()
     {
         return $this->getAttr('xmpRights:WebStatement', self::XMP_RIGHTS_NS);
-    }
-
-    /**
-     * @param $copyrightUrl string
-     *
-     * @return $this
-     */
-    public function setCopyrightUrl($copyrightUrl)
-    {
-        return $this->setAttr('xmpRights:WebStatement', $copyrightUrl, self::XMP_RIGHTS_NS);
     }
 
     /**
@@ -810,31 +461,11 @@ class Xmp
     }
 
     /**
-     * @param $rightsUsageTerms string
-     *
-     * @return $this
-     */
-    public function setRightsUsageTerms($rightsUsageTerms)
-    {
-        return $this->setAlt('xmpRights:UsageTerms', $rightsUsageTerms, self::XMP_RIGHTS_NS);
-    }
-
-    /**
      * @return string
      */
     public function getObjectName()
     {
         return $this->getAttr('dc:title', self::DC_NS);
-    }
-
-    /**
-     * @param $objectName string
-     *
-     * @return $this
-     */
-    public function setObjectName($objectName)
-    {
-        return $this->setAlt('dc:title', $objectName, self::DC_NS);
     }
 
     /**
@@ -846,31 +477,11 @@ class Xmp
     }
 
     /**
-     * @param $captionWriters string
-     *
-     * @return $this
-     */
-    public function setCaptionWriters($captionWriters)
-    {
-        return $this->setAttr('photoshop:CaptionWriter', $captionWriters, self::PHOTOSHOP_NS);
-    }
-
-    /**
      * @return string
      */
     public function getInstructions()
     {
         return $this->getAttr('photoshop:Instructions', self::PHOTOSHOP_NS);
-    }
-
-    /**
-     * @param $instructions string
-     *
-     * @return $this
-     */
-    public function setInstructions($instructions)
-    {
-        return $this->setAttr('photoshop:Instructions', $instructions, self::PHOTOSHOP_NS);
     }
 
     /**
@@ -882,31 +493,11 @@ class Xmp
     }
 
     /**
-     * @param $category string
-     *
-     * @return $this
-     */
-    public function setCategory($category)
-    {
-        return $this->setAttr('photoshop:Category', $category, self::PHOTOSHOP_NS);
-    }
-
-    /**
      * @return array
      */
     public function getSupplementalCategories()
     {
         return $this->getBag('photoshop:SupplementalCategories', self::PHOTOSHOP_NS);
-    }
-
-    /**
-     * @param $supplementalCategories array
-     *
-     * @return $this
-     */
-    public function setSupplementalCategories($supplementalCategories)
-    {
-        return $this->setBag('photoshop:SupplementalCategories', $supplementalCategories, self::PHOTOSHOP_NS);
     }
 
     /**
@@ -918,31 +509,11 @@ class Xmp
     }
 
     /**
-     * @param $contactAddress string
-     *
-     * @return $this
-     */
-    public function setContactAddress($contactAddress)
-    {
-        return $this->setContactAttr('Iptc4xmpCore:CiAdrExtadr', $contactAddress);
-    }
-
-    /**
      * @return string
      */
     public function getContactCity()
     {
         return $this->getContactInfo('Iptc4xmpCore:CiAdrCity');
-    }
-
-    /**
-     * @param $contactCity string
-     *
-     * @return $this
-     */
-    public function setContactCity($contactCity)
-    {
-        return $this->setContactAttr('Iptc4xmpCore:CiAdrCity', $contactCity);
     }
 
     /**
@@ -954,16 +525,6 @@ class Xmp
     }
 
     /**
-     * @param $contactState string
-     *
-     * @return $this
-     */
-    public function setContactState($contactState)
-    {
-        return $this->setContactAttr('Iptc4xmpCore:CiAdrRegion', $contactState);
-    }
-
-    /**
      * @return string
      */
     public function getContactZip()
@@ -972,31 +533,11 @@ class Xmp
     }
 
     /**
-     * @param $contactZip string
-     *
-     * @return $this
-     */
-    public function setContactZip($contactZip)
-    {
-        return $this->setContactAttr('Iptc4xmpCore:CiAdrPcode', $contactZip);
-    }
-
-    /**
      * @return string
      */
     public function getContactCountry()
     {
         return $this->getContactInfo('Iptc4xmpCore:CiAdrCtry');
-    }
-
-    /**
-     * @param $contactCountry string
-     *
-     * @return $this
-     */
-    public function setContactCountry($contactCountry)
-    {
-        return $this->setContactAttr('Iptc4xmpCore:CiAdrCtry', $contactCountry);
     }
 
     /**
@@ -1030,31 +571,11 @@ class Xmp
     }
 
     /**
-     * @param $contactEmail string
-     *
-     * @return $this
-     */
-    public function setContactEmail($contactEmail)
-    {
-        return $this->setContactAttr('Iptc4xmpCore:CiEmailWork', $contactEmail);
-    }
-
-    /**
      * @return string
      */
     public function getContactPhone()
     {
         return $this->getContactInfo('Iptc4xmpCore:CiTelWork');
-    }
-
-    /**
-     * @param $contactPhone string
-     *
-     * @return $this
-     */
-    public function setContactPhone($contactPhone)
-    {
-        return $this->setContactAttr('Iptc4xmpCore:CiTelWork', $contactPhone);
     }
 
     /**
@@ -1066,31 +587,11 @@ class Xmp
     }
 
     /**
-     * @param $contactUrl string
-     *
-     * @return $this
-     */
-    public function setContactUrl($contactUrl)
-    {
-        return $this->setContactAttr('Iptc4xmpCore:CiUrlWork', $contactUrl);
-    }
-
-    /**
      * @return array
      */
     public function getKeywords()
     {
         return $this->getBag('dc:subject', self::DC_NS);
-    }
-
-    /**
-     * @param $keywords array
-     *
-     * @return $this
-     */
-    public function setKeywords($keywords)
-    {
-        return $this->setBag('dc:subject', $keywords, self::DC_NS);
     }
 
     /**
@@ -1102,31 +603,11 @@ class Xmp
     }
 
     /**
-     * @param $transmissionReference string
-     *
-     * @return $this
-     */
-    public function setTransmissionReference($transmissionReference)
-    {
-        return $this->setAttr('photoshop:TransmissionReference', $transmissionReference, self::PHOTOSHOP_NS);
-    }
-
-    /**
      * @return string
      */
     public function getUrgency()
     {
         return $this->getAttr('photoshop:Urgency', self::PHOTOSHOP_NS);
-    }
-
-    /**
-     * @param $urgency string
-     *
-     * @return $this
-     */
-    public function setUrgency($urgency)
-    {
-        return $this->setAttr('photoshop:Urgency', $urgency, self::PHOTOSHOP_NS);
     }
 
     /**
@@ -1138,37 +619,11 @@ class Xmp
     }
 
     /**
-     * @param $rating
-     *
-     * @return $this
-     */
-    public function setRating($rating)
-    {
-        $this->setAttr('xmp:Rating', $rating, self::XMP_NS);
-
-        // set custom attributes used by Photo Mechanic
-        $this->setAttr('photomechanic:RatingEval', $rating, self::PHOTO_MECHANIC_NS);
-        $this->setAttr('photomechanic:RatingApply', 'True', self::PHOTO_MECHANIC_NS);
-
-        return $this;
-    }
-
-    /**
      * @return string
      */
     public function getCreatorTool()
     {
         return $this->getAttr('xmp:CreatorTool', self::XMP_NS);
-    }
-
-    /**
-     * @param $creatorTool
-     *
-     * @return $this
-     */
-    public function setCreatorTool($creatorTool)
-    {
-        return $this->setAttr('xmp:CreatorTool', $creatorTool, self::XMP_NS);
     }
 
     /**
@@ -1180,31 +635,11 @@ class Xmp
     }
 
     /**
-     * @param array $personsShown
-     *
-     * @return $this
-     */
-    public function setPersonsShown($personsShown)
-    {
-        return $this->setBag('Iptc4xmpExt:PersonInImage', $personsShown, self::IPTC4_XMP_EXT_NS);
-    }
-
-    /**
      * @return string
      */
     public function getIntellectualGenre()
     {
         return $this->getAttr('Iptc4xmpCore:IntellectualGenre', self::IPTC4_XMP_CORE_NS);
-    }
-
-    /**
-     * @param $intellectualGenre string
-     *
-     * @return $this
-     */
-    public function setIntellectualGenre($intellectualGenre)
-    {
-        return $this->setAttr('Iptc4xmpCore:IntellectualGenre', $intellectualGenre, self::IPTC4_XMP_CORE_NS);
     }
 
     /**
@@ -1232,17 +667,6 @@ class Xmp
     }
 
     /**
-     * @param \DateTime $dateCreated
-     * @param string    $format
-     *
-     * @return $this
-     */
-    public function setDateCreated(\DateTime $dateCreated, $format = 'Y-m-d')
-    {
-        return $this->setAttr('photoshop:DateCreated', $dateCreated->format($format), self::PHOTOSHOP_NS);
-    }
-
-    /**
      * Get about.
      *
      * @return string
@@ -1250,19 +674,6 @@ class Xmp
     public function getAbout()
     {
         return $this->about;
-    }
-
-    /**
-     * According to the XMP spec, the value of this attribute is required but should generally be empty.
-     *
-     * @param string $about
-     *
-     * @return $this
-     */
-    public function setAbout($about)
-    {
-        $this->about = $about;
-        return $this;
     }
 
     /**
@@ -1277,17 +688,6 @@ class Xmp
         }
 
         return null;
-    }
-
-    /**
-     * @param $toolkit
-     *
-     * @return $this
-     */
-    public function setToolkit($toolkit)
-    {
-        $this->dom->documentElement->setAttributeNS('adobe:ns:meta/', 'x:xmptk', $toolkit);
-        return $this;
     }
 
     /**
@@ -1336,32 +736,11 @@ class Xmp
     }
 
     /**
-     * @return \DomDocument
-     */
-    public function getDom()
-    {
-        // mark as had changes, as changes may be made to DomDocument
-        $this->hasChanges = true;
-
-        return $this->dom;
-    }
-
-    /**
      * @return array
      */
     public function getIPTCScene()
     {
         return $this->getBag('Iptc4xmpCore:Scene', self::IPTC4_XMP_CORE_NS);
-    }
-
-    /**
-     * @param array $iptcScene
-     *
-     * @return $this
-     */
-    public function setIPTCScene($iptcScene)
-    {
-        return $this->setBag('Iptc4xmpCore:Scene', $iptcScene, self::IPTC4_XMP_CORE_NS);
     }
 
     /**
@@ -1373,31 +752,11 @@ class Xmp
     }
 
     /**
-     * @param array $featuredOrganisationName
-     *
-     * @return $this
-     */
-    public function setFeaturedOrganisationName($featuredOrganisationName)
-    {
-        return $this->setBag('Iptc4xmpExt:OrganisationInImageName', $featuredOrganisationName, self::IPTC4_XMP_EXT_NS);
-    }
-
-    /**
      * @return array
      */
     public function getFeaturedOrganisationCode()
     {
         return $this->getBag('Iptc4xmpExt:OrganisationInImageCode', self::IPTC4_XMP_EXT_NS);
-    }
-
-    /**
-     * @param array $featuredOrganisationCode
-     *
-     * @return $this
-     */
-    public function setFeaturedOrganisationCode($featuredOrganisationCode)
-    {
-        return $this->setBag('Iptc4xmpExt:OrganisationInImageCode', $featuredOrganisationCode, self::IPTC4_XMP_EXT_NS);
     }
 
     /**
@@ -1442,13 +801,5 @@ class Xmp
         );
 
         return $results;
-    }
-
-    /**
-     * @return bool
-     */
-    public function hasChanges()
-    {
-        return $this->hasChanges;
     }
 }

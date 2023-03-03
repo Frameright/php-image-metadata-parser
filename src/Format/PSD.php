@@ -46,115 +46,15 @@ class PSD extends Image {
      * @param type $IRBs
      * @param type $soIRS
      * @param type $eoIRS
-     * @param type $filename
      */
-    private function __construct($fileHeader, $IRBs, $soIRS, $eoIRS, $tmpHandle, $filename = null)
+    private function __construct($fileHeader, $IRBs, $soIRS, $eoIRS, $tmpHandle)
     {
 
         $this->IRBs = $IRBs;
         $this->fileheader = $fileHeader;
         $this->soIRS = $soIRS;
         $this->eoIRS = $eoIRS;
-        $this->filename = $filename;
         $this->tmpHandle = $tmpHandle;
-    }
-
-    /**
-     * Set xmp data.
-     * @param Xmp $xmp
-     *
-     * @return $this
-     */
-    public function setXmp(Xmp $xmp)
-    {
-        $this->xmp = $xmp;
-        $present = false;
-        foreach ($this->IRBs as $IRB) {
-            if ($IRB->getResourceId() === self::IRID_XMP) {
-                $IRB->setData($xmp->getString());
-                $present = true;
-            }
-        }
-        // Add if not present.
-        if (!$present) {
-            $this->IRBs[] = new PSD\IRB(self::IRID_XMP, "\x00\x00", $xmp->getString());
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getBytes()
-    {
-        $stream = fopen('php://temp', 'r+');
-        $this->write($stream);
-
-        rewind($stream);
-
-        $contents = stream_get_contents($stream);
-
-        fclose($stream);
-
-        return $contents;
-    }
-
-    /**
-     * Save to file.
-     *
-     * @param string $filename
-     * @throws \Exception
-     * @return void
-     */
-    public function save($filename = null)
-    {
-        $filename = $filename ? : $this->filename;
-
-        // Attempt to open the new psd file
-        $handle = @fopen($filename, 'wb+');
-
-        // Check if the file opened successfully
-        if (!$handle) {
-            throw new \Exception(sprintf('Could not open file %s', $filename));
-        }
-
-        $this->write($handle);
-        fclose($handle);
-    }
-
-    /**
-     * Write PSD data to a stream/file.
-     *
-     * @param $handle
-     */
-    private function write($handle)
-    {
-        $IRBData = '';
-        foreach ($this->IRBs as $IRB) {
-            $IRBData .= self::IRB_SIGNATURE;
-            $IRBData .= $IRB->getResourceId();
-            $IRBData .= $IRB->getPascalString();
-            $IRBData .= pack('N', $IRB->getLength());
-            $IRBData .= $IRB->getData();
-            // Add padding byte.
-            if ($IRB->getLength() & 1) {
-                $IRBData .= "\x00";
-            }
-        }
-        $fileData = $this->fileheader . pack('N', strlen($IRBData)) . $IRBData;
-
-        fwrite($handle, $fileData);
-        stream_copy_to_stream($this->tmpHandle, $handle, -1, $this->eoIRS);
-        fclose($this->tmpHandle);
-
-        // Update tmp-file.
-        $this->tmpHandle = tmpfile();
-        rewind($handle);
-        stream_copy_to_stream($handle, $this->tmpHandle);
-
-        //update end of IRS
-        $this->eoIRS = $this->soIRS + 4 + strlen($IRBData);
     }
 
     /**
@@ -193,12 +93,11 @@ class PSD extends Image {
      * Load a PSD from a stream.
      *
      * @param resource $fileHandle
-     * @param string   $filename
      *
      * @return self
      * @throws \Exception
      */
-    public static function fromStream($fileHandle, $filename = null)
+    public static function fromStream($fileHandle)
     {
         try {
             // Read the first two characters
@@ -242,7 +141,7 @@ class PSD extends Image {
             $tmpHandle = tmpfile();
             rewind($fileHandle);
             stream_copy_to_stream($fileHandle, $tmpHandle);
-            return new self($fileHeader, $IRBs, $soIRS, $eoIRS, $tmpHandle, $filename);
+            return new self($fileHeader, $IRBs, $soIRS, $eoIRS, $tmpHandle);
         } finally {
             fclose($fileHandle);
         }
@@ -295,7 +194,7 @@ class PSD extends Image {
             throw new \Exception(sprintf('Could not open file %s', $filename));
         }
 
-        return self::fromStream($fileHandle, $filename);
+        return self::fromStream($fileHandle);
     }
 
     /**

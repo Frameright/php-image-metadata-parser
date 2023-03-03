@@ -21,22 +21,16 @@ class PNG extends Image
     private $xmp;
 
     /**
-     * @var bool
-     */
-    private $hasNewXmp = false;
-
-    /**
      * @var PNG\Chunk[]
      */
     private $chunks;
 
     /**
      * @param string $contents
-     * @param string $filename
      *
      * @throws \Exception
      */
-    public function __construct($contents, $filename = null)
+    public function __construct($contents)
     {
         $signature = substr($contents, 0, 8);
 
@@ -46,38 +40,6 @@ class PNG extends Image
         }
 
         $this->chunks = $this->getChunksFromContents($contents);
-        $this->filename = $filename;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getBytes()
-    {
-        if ($this->xmp && ($this->xmp->hasChanges() || $this->hasNewXmp)) {
-            $data = "XML:com.adobe.xmp\x00\x00\x00\x00\x00" . $this->xmp->getString();
-
-            $xmpChunk = $this->getXmpChunk();
-
-            if ($xmpChunk) {
-                // update the existing chunk
-                $xmpChunk->setData($data);
-            } else {
-                // add new chunk to contain XMP data
-                $xmpChunk = new PNG\Chunk('iTXt', $data);
-
-                // insert before the last chunk (iEND)
-                array_splice($this->chunks, count($this->chunks) - 1, 0, [$xmpChunk]);
-            }
-        }
-
-        $file = self::SIGNATURE;
-
-        foreach ($this->chunks as $chunk) {
-            $file .= $chunk->getChunk();
-        }
-
-        return $file;
     }
 
     /**
@@ -100,19 +62,6 @@ class PNG extends Image
         }
 
         return $this->xmp;
-    }
-
-    /**
-     * @param Xmp $xmp
-     *
-     * @return $this
-     */
-    public function setXmp(Xmp $xmp)
-    {
-        $this->xmp = $xmp;
-        $this->hasNewXmp = true;
-
-        return $this;
     }
 
     /**
@@ -152,7 +101,7 @@ class PNG extends Image
      */
     public static function fromFile($filename)
     {
-        return new self(file_get_contents($filename), $filename);
+        return new self(file_get_contents($filename));
     }
 
     /**

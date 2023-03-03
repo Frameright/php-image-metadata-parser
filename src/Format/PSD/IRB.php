@@ -56,15 +56,4 @@ class IRB {
         return strlen($this->data);
     }
 
-    /**
-     * @param string $data
-     *
-     * @return $this
-     */
-    public function setData($data)
-    {
-        $this->data = $data;
-        return $this;
-    }
-
 }

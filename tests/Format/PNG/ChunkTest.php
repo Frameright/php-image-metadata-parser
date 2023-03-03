@@ -53,15 +53,4 @@ class ChunkTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals('0000000469545874646174611d2449b7', bin2hex($chunk->getChunk()));
     }
-
-    /**
-     * @covers ::setData
-     */
-    public function testSetData()
-    {
-        $chunk = new Chunk('iTXt', 'data');
-        $chunk->setData('newdata');
-
-        $this->assertEquals('newdata', $chunk->getData());
-    }
 }

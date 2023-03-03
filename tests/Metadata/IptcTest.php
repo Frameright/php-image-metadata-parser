@@ -86,43 +86,6 @@ class IptcTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getMetaFields
      */
-    public function testGetSetMeta($field)
-    {
-        $setter = 'set' . ucfirst($field);
-
-        $value = 'test';
-
-        $iptc = new Iptc;
-        $return = $iptc->$setter($value);
-
-        $this->assertSame($iptc, $return);
-
-        $getter = 'get' . ucfirst($field);
-
-        $this->assertSame($value, $iptc->$getter());
-    }
-
-    /**
-     * @dataProvider getMetaFields
-     */
-    public function testHasChanges($field)
-    {
-        $setter = 'set' . ucfirst($field);
-
-        $value = 'test';
-
-        $iptc = new Iptc;
-
-        $this->assertFalse($iptc->hasChanges());
-
-        $iptc->$setter($value);
-
-        $this->assertTrue($iptc->hasChanges());
-    }
-
-    /**
-     * @dataProvider getMetaFields
-     */
     public function testNull($field)
     {
         $getter = 'get' . ucfirst($field);
@@ -130,20 +93,5 @@ class IptcTest extends \PHPUnit\Framework\TestCase
         $iptc = new Iptc;
 
         $this->assertNull($iptc->$getter());
-    }
-
-    public function testAll()
-    {
-        $iptc = new Iptc;
-
-        $this->assertSame([], $iptc->all());
-
-        $iptc->setHeadline('Headline');
-        $iptc->setCaption('Caption');
-
-        $this->assertSame(
-            ['2#105' => ['Headline'], '2#120' => ['Caption']],
-            $iptc->all()
-        );
     }
 }

@@ -135,64 +135,6 @@ class XmpTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider getAltFields
-     */
-    public function testSetAltFields($field, $xmlField)
-    {
-        $this->assertValidList('rdf:Alt', $field, $xmlField, $field);
-    }
-
-    /**
-     * @dataProvider getBagFields
-     */
-    public function testSetBagFields($field, $xmlField)
-    {
-        $this->assertValidList('rdf:Bag', $field, $xmlField, $field);
-        $this->assertValidList('rdf:Bag', $field, $xmlField, [$field, $field]);
-    }
-
-    /**
-     * @dataProvider getAttrFields
-     */
-    public function testSetAttrFields($field, $xmlField)
-    {
-        $value = 'A test string, with utf €åƒ∂, and some xml chars such as <>"';
-        $expectedAttr = $xmlField . '="A test string, with utf €åƒ∂, and some xml chars such as &lt;&gt;&quot;"';
-        $expectedElement = '<' . $xmlField . '>A test string, with utf €åƒ∂, and some xml chars such as &lt;&gt;"</' . $xmlField . '>';
-
-        $setter = 'set' . ucfirst($field);
-
-        // test with no meta data
-        $xmp = new Xmp;
-        $xmp->$setter($value);
-
-        $this->assertStringContainsString($expectedAttr, $xmp->getString());
-
-        // test with empty meta data
-        $xmp = new Xmp('<x:xmpmeta xmlns:x="adobe:ns:meta/" />');
-        $xmp->$setter($value);
-
-        $this->assertStringContainsString($expectedAttr, $xmp->getString());
-
-        // test with existing meta data
-        $xmp = $this->getXmpFromFile();
-        $xmp->$setter($value);
-
-        $this->assertStringContainsString($expectedAttr, $xmp->getString());
-
-        // test with existing meta data
-        $xmp = $this->getXmpFromFile2();
-        $xmp->$setter($value);
-
-        $this->assertStringContainsString($expectedElement, $xmp->getString());
-    }
-
-    public function testSetPhotographerName()
-    {
-        $this->assertValidList('rdf:Seq', 'photographerName', 'dc:creator', 'Photographer Name');
-    }
-
-    /**
      * @covers ::getToolkit
      */
     public function testGetToolkit()
@@ -212,17 +154,6 @@ class XmpTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @covers ::setToolkit
-     */
-    public function testSetToolkit()
-    {
-        $xmp = new Xmp;
-        $xmp->setToolkit('Toolkit 1.2.3');
-
-        $this->assertStringContainsString('x:xmptk="Toolkit 1.2.3"', $xmp->getString());
-    }
-
-    /**
      * @covers ::getXml
      */
     public function testXmpContainsProcessingInstructions()
@@ -230,20 +161,6 @@ class XmpTest extends \PHPUnit\Framework\TestCase
         $this->assertXmpContainsProcessingInstructions(new Xmp);
         $this->assertXmpContainsProcessingInstructions(new Xmp('<x:xmpmeta xmlns:x="adobe:ns:meta/" />'));
         $this->assertXmpContainsProcessingInstructions($this->getXmpFromFile());
-    }
-
-    /**
-     * @covers ::fromArray
-     *
-     * @dataProvider getDataForAllFile
-     */
-    public function testFromArray($field, $value)
-    {
-        $getter = 'get' . ucfirst($field);
-
-        $xmp = Xmp::fromArray([$field => $value]);
-
-        $this->assertEquals($value, $xmp->$getter());
     }
 
     /**
@@ -255,24 +172,6 @@ class XmpTest extends \PHPUnit\Framework\TestCase
 
         $xmp = new Xmp;
         $this->assertNull($xmp->$getter());
-    }
-
-    /**
-     * Test that changing a single piece of metadata changes state of hasChanges.
-     *
-     * @dataProvider getDataForAllFile
-     */
-    public function testHasChanges($field, $value)
-    {
-        $setter = 'set' . ucfirst($field);
-
-        $xmp = new Xmp;
-
-        $this->assertFalse($xmp->hasChanges());
-
-        $xmp->$setter($value);
-
-        $this->assertTrue($xmp->hasChanges());
     }
 
     /**
@@ -354,22 +253,6 @@ class XmpTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @covers ::getAbout
-     * @covers ::setAbout
-     */
-    public function testAbout()
-    {
-        $xmp = new Xmp;
-
-        // should be empty string by default
-        $this->assertSame('', $xmp->getAbout());
-
-        $xmp->setAbout('about');
-
-        $this->assertSame('about', $xmp->getAbout());
-    }
-
-    /**
      * @covers ::getFormatOutput
      * @covers ::setFormatOutput
      */
@@ -383,81 +266,6 @@ class XmpTest extends \PHPUnit\Framework\TestCase
 
         $this->assertSame($xmp, $return);
         $this->assertTrue($xmp->getFormatOutput());
-    }
-
-    public function testDeleteList()
-    {
-        $xmp = new Xmp;
-
-        $xmp->setSupplementalCategories(['a category', 'another category']);
-        $xmp->setSupplementalCategories([]);
-
-        $this->assertStringNotContainsString('photoshop:SupplementalCategories', $xmp->getString());
-    }
-
-    /**
-     * @dataProvider getAttrFields
-     */
-    public function testSetNullAttribute($field, $xmlField)
-    {
-        $setter = 'set' . ucfirst($field);
-
-        $xmp = new Xmp;
-        $xmp->$setter($field);
-        $xmp->$setter(null);
-
-        $this->assertStringNotContainsString($xmlField, $xmp->getString());
-
-        $xmp = $this->getXmpFromFile();
-        $xmp->$setter(null);
-
-        $this->assertStringNotContainsString($xmlField, $xmp->getString());
-
-        $xmp = $this->getXmpFromFile2();
-        $xmp->$setter(null);
-
-        $this->assertStringNotContainsString($xmlField, $xmp->getString());
-    }
-
-    /**
-     * @covers ::getDateCreated
-     * @covers ::setDateCreated
-     */
-    public function testDateCreated()
-    {
-        $xmp = new Xmp;
-
-        $this->assertNull($xmp->getDateCreated());
-
-        $xmp = new Xmp;
-        $xmp->setDateCreated($date = new \DateTime('now'));
-        $this->assertEquals($date->format('c'), $xmp->getDateCreated()->format('c'));
-
-        $xmp = new Xmp;
-        $xmp->setDateCreated($date = new \DateTime('now'), 'Y');
-        $this->assertEquals($date->format('Y'), $xmp->getDateCreated()->format('Y'));
-
-        $xmp = new Xmp;
-        $xmp->setDateCreated($date = new \DateTime('now'), 'Y-m');
-        $this->assertEquals($date->format('Y-m'), $xmp->getDateCreated()->format('Y-m'));
-
-        $xmp = new Xmp;
-        $xmp->setDateCreated($date = new \DateTime('now'), 'Y-m-d');
-        $this->assertEquals($date->format('Y-m-d'), $xmp->getDateCreated()->format('Y-m-d'));
-
-        // test with invalid date
-        $xmp = new Xmp('
-            <x:xmpmeta xmlns:x="adobe:ns:meta/" x:xmptk="XMP Core 5.1.2">
-              <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-                <rdf:Description rdf:about=""
-                  xmlns:photoshop="http://ns.adobe.com/photoshop/1.0/"
-                  photoshop:DateCreated="DATE" />
-              </rdf:RDF>
-            </x:xmpmeta>
-        ');
-
-        $this->assertFalse($xmp->getDateCreated());
-
     }
 
     /**
@@ -484,44 +292,6 @@ class XmpTest extends \PHPUnit\Framework\TestCase
     {
         $this->assertStringContainsString("<?xpacket begin=\"\xef\xbb\xbf\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>", $xmp->getString());
         $this->assertStringContainsString('<?xpacket end="w"?>', $xmp->getString());
-    }
-
-    /**
-     * @param $type
-     * @param $field
-     * @param $xmlField
-     * @param $value
-     */
-    private function assertValidList($type, $field, $xmlField, $value)
-    {
-        $attributes = ($type == 'rdf:Alt')? ' xml:lang="x-default"': '';
-
-        $expected  = '<' . $xmlField . '><' . $type . '>';
-
-        foreach ((array) $value as $li) {
-            $expected .= '<rdf:li' . $attributes . '>' . $li . '</rdf:li>';
-        }
-
-        $expected .= '</' . $type . '></' . $xmlField . '>';
-
-        $setter = 'set' . ucfirst($field);
-
-        $xmp = new Xmp;
-        $xmp->$setter($value);
-
-        $this->assertStringContainsString($expected, $xmp->getString());
-
-        // test setting value on existing meta data
-        $xmp = $this->getXmpFromFile();
-        $xmp->$setter($value);
-
-        $this->assertStringContainsString($expected, $xmp->getString());
-
-        // test setting value on existing meta data
-        $xmp = $this->getXmpFromFile2();
-        $xmp->$setter($value);
-
-        $this->assertStringContainsString($expected, $xmp->getString());
     }
 
     /**

@@ -129,19 +129,6 @@ class Segment
     }
 
     /**
-     * Set data.
-     *
-     * @param mixed $data
-     *
-     * @return $this
-     */
-    public function setData($data)
-    {
-        $this->data = $data;
-        return $this;
-    }
-
-    /**
      * Get start.
      *
      * @return mixed
@@ -152,19 +139,6 @@ class Segment
     }
 
     /**
-     * Set start.
-     *
-     * @param mixed $start
-     *
-     * @return $this
-     */
-    public function setStart($start)
-    {
-        $this->start = $start;
-        return $this;
-    }
-
-    /**
      * Get type.
      *
      * @return mixed
@@ -172,19 +146,6 @@ class Segment
     public function getType()
     {
         return $this->type;
-    }
-
-    /**
-     * Set type.
-     *
-     * @param mixed $type
-     *
-     * @return $this
-     */
-    public function setType($type)
-    {
-        $this->type = $type;
-        return $this;
     }
 
     /**

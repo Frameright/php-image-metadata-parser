@@ -14,23 +14,6 @@ interface ImageInterface
 {
 
     /**
-     * @param $filename
-     *
-     * @return bool
-     */
-    public function save($filename = null);
-
-    /**
-     * @return string
-     */
-    public function getBytes();
-
-    /**
-     * @param $filename
-     */
-    public function setFilename($filename);
-
-    /**
      * @return Xmp
      * @throws UnsupportedException
      */

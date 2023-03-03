@@ -48,49 +48,6 @@ class AbstractImageTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @covers ::save
-     * @covers ::setFilename
-     */
-    public function testSave()
-    {
-        $tmp = tempnam(sys_get_temp_dir(), 'PNG');
-
-        $image = $this->getMockForAbstractImage();
-        $image->expects($this->once())->method('getBytes')->will($this->returnValue('Test'));
-
-        $this->assertSame($image, $image->setFilename($tmp)); // test fluid interface
-
-        $image->save();
-
-        $this->assertEquals('Test', file_get_contents($tmp));
-    }
-
-    /**
-     * @covers ::save
-     */
-    public function testSaveWithFilename()
-    {
-        $tmp = tempnam(sys_get_temp_dir(), 'PNG');
-
-        $image = $this->getMockForAbstractImage();
-        $image->expects($this->once())->method('getBytes')->will($this->returnValue('Test'));
-        $image->save($tmp);
-
-        $this->assertEquals('Test', file_get_contents($tmp));
-    }
-
-    /**
-     * @covers ::save
-     */
-    public function testSaveWithNoFilename()
-    {
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Must provide a filename');
-        $image = $this->getMockForAbstractImage();
-        $image->save();
-    }
-
-    /**
      * @return Image|\PHPUnit\Framework\MockObject\MockObject
      */
     private function getMockForAbstractImage()

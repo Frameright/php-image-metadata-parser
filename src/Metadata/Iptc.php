@@ -44,11 +44,6 @@ class Iptc
     private $data;
 
     /**
-     * @var bool
-     */
-    private $hasChanges = false;
-
-    /**
      * Constructor.
      *
      * @param array $data
@@ -291,37 +286,11 @@ class Iptc
     }
 
     /**
-     * @param string $field
-     * @param mixed  $value
-     *
-     * @return $this
-     */
-    private function set($field, $value)
-    {
-        $code = $this->fields[$field];
-
-        $this->data[$code] = $value;
-        $this->hasChanges = true;
-
-        return $this;
-    }
-
-    /**
      * @return string
      */
     public function getHeadline()
     {
         return $this->get('headline');
-    }
-
-    /**
-     * @param string $headline
-     *
-     * @return $this
-     */
-    public function setHeadline($headline)
-    {
-        return $this->set('headline', [$headline]);
     }
 
     /**
@@ -333,31 +302,11 @@ class Iptc
     }
 
     /**
-     * @param $caption
-     *
-     * @return $this
-     */
-    public function setCaption($caption)
-    {
-        return $this->set('caption', [$caption]);
-    }
-
-    /**
      * @return string
      */
     public function getLocation()
     {
         return $this->get('location');
-    }
-
-    /**
-     * @param $location
-     *
-     * @return $this
-     */
-    public function setLocation($location)
-    {
-        return $this->set('location', [$location]);
     }
 
     /**
@@ -369,31 +318,11 @@ class Iptc
     }
 
     /**
-     * @param $city
-     *
-     * @return $this
-     */
-    public function setCity($city)
-    {
-        return $this->set('city', [$city]);
-    }
-
-    /**
      * @return string
      */
     public function getState()
     {
         return $this->get('state');
-    }
-
-    /**
-     * @param $state
-     *
-     * @return $this
-     */
-    public function setState($state)
-    {
-        return $this->set('state', [$state]);
     }
 
     /**
@@ -405,31 +334,11 @@ class Iptc
     }
 
     /**
-     * @param $country
-     *
-     * @return $this
-     */
-    public function setCountry($country)
-    {
-        return $this->set('country', [$country]);
-    }
-
-    /**
      * @return string
      */
     public function getCountryCode()
     {
         return $this->get('countryCode');
-    }
-
-    /**
-     * @param $countryCode
-     *
-     * @return $this
-     */
-    public function setCountryCode($countryCode)
-    {
-        return $this->set('countryCode', [$countryCode]);
     }
 
     /**
@@ -441,31 +350,11 @@ class Iptc
     }
 
     /**
-     * @param $photographerName
-     *
-     * @return $this
-     */
-    public function setPhotographerName($photographerName)
-    {
-        return $this->set('photographerName', [$photographerName]);
-    }
-
-    /**
      * @return string
      */
     public function getCredit()
     {
         return $this->get('credit');
-    }
-
-    /**
-     * @param $credit
-     *
-     * @return $this
-     */
-    public function setCredit($credit)
-    {
-        return $this->set('credit', [$credit]);
     }
 
     /**
@@ -477,31 +366,11 @@ class Iptc
     }
 
     /**
-     * @param $photographerTitle
-     *
-     * @return $this
-     */
-    public function setPhotographerTitle($photographerTitle)
-    {
-        return $this->set('photographerTitle', [$photographerTitle]);
-    }
-
-    /**
      * @return string
      */
     public function getSource()
     {
         return $this->get('source');
-    }
-
-    /**
-     * @param $source
-     *
-     * @return $this
-     */
-    public function setSource($source)
-    {
-        return $this->set('source', [$source]);
     }
 
     /**
@@ -513,31 +382,11 @@ class Iptc
     }
 
     /**
-     * @param $copyright
-     *
-     * @return $this
-     */
-    public function setCopyright($copyright)
-    {
-        return $this->set('copyright', [$copyright]);
-    }
-
-    /**
      * @return string
      */
     public function getObjectName()
     {
         return $this->get('objectName');
-    }
-
-    /**
-     * @param $objectName
-     *
-     * @return $this
-     */
-    public function setObjectName($objectName)
-    {
-        return $this->set('objectName', [$objectName]);
     }
 
     /**
@@ -549,31 +398,11 @@ class Iptc
     }
 
     /**
-     * @param $captionWriters
-     *
-     * @return $this
-     */
-    public function setCaptionWriters($captionWriters)
-    {
-        return $this->set('captionWriters', [$captionWriters]);
-    }
-
-    /**
      * @return string
      */
     public function getInstructions()
     {
         return $this->get('instructions');
-    }
-
-    /**
-     * @param $instructions
-     *
-     * @return $this
-     */
-    public function setInstructions($instructions)
-    {
-        return $this->set('instructions', [$instructions]);
     }
 
     /**
@@ -585,31 +414,11 @@ class Iptc
     }
 
     /**
-     * @param $category
-     *
-     * @return $this
-     */
-    public function setCategory($category)
-    {
-        return $this->set('category', [$category]);
-    }
-
-    /**
      * @return string
      */
     public function getSupplementalCategories()
     {
         return $this->get('supplementalCategories');
-    }
-
-    /**
-     * @param $supplementalCategories
-     *
-     * @return $this
-     */
-    public function setSupplementalCategories($supplementalCategories)
-    {
-        return $this->set('supplementalCategories', [$supplementalCategories]);
     }
 
     /**
@@ -621,16 +430,6 @@ class Iptc
     }
 
     /**
-     * @param $transmissionReference
-     *
-     * @return $this
-     */
-    public function setTransmissionReference($transmissionReference)
-    {
-        return $this->set('transmissionReference', [$transmissionReference]);
-    }
-
-    /**
      * @return string
      */
     public function getUrgency()
@@ -639,31 +438,11 @@ class Iptc
     }
 
     /**
-     * @param $urgency
-     *
-     * @return $this
-     */
-    public function setUrgency($urgency)
-    {
-        return $this->set('urgency', [$urgency]);
-    }
-
-    /**
      * @return string
      */
     public function getKeywords()
     {
         return $this->get('keywords', false);
-    }
-
-    /**
-     * @param $keywords
-     *
-     * @return $this
-     */
-    public function setKeywords($keywords)
-    {
-        return $this->set('keywords', $keywords);
     }
 
     /**
@@ -681,19 +460,6 @@ class Iptc
     }
 
     /**
-     * @param \DateTime $date
-     *
-     * @return $this
-     */
-    public function setDateCreated(\DateTime $date)
-    {
-        //$this->set('date', );
-        //$this->set('time', );
-
-        return $this;
-    }
-
-    /**
      * Get the IPTC data.
      *
      * @return array
@@ -701,13 +467,5 @@ class Iptc
     public function all()
     {
         return $this->data;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function hasChanges()
-    {
-        return $this->hasChanges;
     }
 }
