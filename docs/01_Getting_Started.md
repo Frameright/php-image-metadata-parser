@@ -2,7 +2,7 @@
 
 ## Supported image formats
 
-Currently the library supports JPEG, ....
+Currently the library supports JPEG and PNG.
 
 Each supported image format has its own class in the `CSD\Image\Format` namespace.
 
@@ -32,7 +32,7 @@ $png = PNG::fromFile('yourfile.png');
 ...
 ```
 
-File format classes exist for all [supported file formats](#supported-file-formats).
+File format classes exist for all [supported file formats](#supported-image-formats).
 
 ### From a string
 
@@ -49,9 +49,9 @@ $image = JPEG::fromString($data);
 
 ### From a GD resource
 
-You can add metadata to a GD resource using the library.
+You can load the library from a GD resource too.
 
-```
+```php
 // example of creating an image with GD
 $gd = imagecreate(100, 100);
 
@@ -62,7 +62,7 @@ $jpeg = JPEG::fromResource($gd);
 
 If you already have a stream, e.g. an open file, you can pass the file too.
 
-```
+```php
 $file = fopen('...', 'r+');
 
 $jpeg = JPEG::fromStream($file);
