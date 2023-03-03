@@ -1,61 +1,42 @@
-Image metadata library (PHP 5.5+)
-=========
+# Image metadata parsing library (PHP 5.5+)
 
-> **NOTE**: this fork of [dchesterton/image](https://github.com/dchesterton/image)
-> adds the following changes:
->
-> * added `Xmp::getImageRegions()`,
-> * fixed WebP header generation,
-> * unit tests made runnable on PHP8 and newer PHPUnit,
-> * added linter to validate code against any version of PHP >= 5.5 .
->
-> Run the linter and the unit tests with: (see also
-> https://github.com/Frameright/image/issues/4 )
->
-> ```bash
-> $ composer install
-> $ composer lint
-> $ composer test
-> ```
->
-> Pull the library in your project  via [Composer](https://getcomposer.org/)
-> with the following `composer.json`:
->
-> ```json
-> {
->   "minimum-stability": "dev",
->   "repositories": [
->     {
->       "type": "vcs",
->       "url": "https://github.com/Frameright/image.git"
->     }
->   ],
->   "require": {
->     "dchesterton/image": "dev-master"
->   }
-> }
-> ```
->
-> **Dependencies**: [`php-xml`](https://www.php.net/manual/en/book.dom.php)
-
-## Warning: This library is pre-alpha and much of it is a WIP or simply not working at all. Proceed at your own risk.
+> **NOTE**: this is based on
+> [dchesterton/image](https://github.com/dchesterton/image). Many thanks to
+  [dchesterton](https://github.com/dchesterton)!
 
 Supported image types:
    - JPEG
    - PNG
-   - ~~GIF~~
-   - ~~PDF~~
-   - ~~SVG~~
    - ~~WEBP~~
-   - ~~TIFF~~
-   - ~~DNG~~
-   - ~~RAW FORMATS~~
-   - ~~CR2, NEF, etc.~~
 
 Supported image meta types:
    - XMP
    - IPTC
    - ~~EXIF~~
+
+## Installation
+
+Pull the library in your project  via [Composer](https://getcomposer.org/)
+with the following `composer.json`:
+
+```json
+{
+  "minimum-stability": "dev",
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/Frameright/php-image-metadata-parser.git"
+    }
+  ],
+  "require": {
+    "frameright/image-metadata-parser": "dev-master"
+  }
+}
+```
+
+**Dependencies**: [`php-xml`](https://www.php.net/manual/en/book.dom.php)
+
+## Usage
 
 ### Get metadata
 
@@ -195,4 +176,14 @@ $gps = $image->getAggregateMeta()->getGPS(); // checks EXIF and XMP
 // or $gps = $image->getExif()->getGPS();
 
 $lat = $gps->getLatitude();
+```
+
+## Contributing
+
+Run the linter and the unit tests with:
+
+```bash
+composer install
+composer lint
+composer test
 ```

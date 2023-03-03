@@ -1,12 +1,5 @@
 # Getting Started
 
-The recommended way of installing the client is via [Composer](http://getcomposer.org/). Run the following command to
-add the library to your composer.json file.
-
-```
-composer require dchesterton/image
-```
-
 ## Supported image formats
 
 Currently the library supports JPEG, ....

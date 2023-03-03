@@ -1,9 +1,21 @@
 {
-    "name": "dchesterton/image",
+    "name": "frameright/image-metadata-parser",
     "license": "MIT",
     "keywords": ["Image", "Photo", "Metadata", "XMP", "IPTC", "Exif"],
     "description": "Image metadata library",
     "authors": [
+        {
+            "name": "Frameright (Coberg Ltd)",
+            "email": "hello@frameright.io",
+            "homepage": "https://frameright.io/",
+            "role": "Developer"
+        },
+        {
+            "name": "Aurelien Lourot",
+            "email": "software@lourot.dev",
+            "homepage": "https://lourot.dev/",
+            "role": "Developer"
+        },
         {
             "name": "Daniel Chesterton",
             "email": "daniel@chestertondevelopment.com",
