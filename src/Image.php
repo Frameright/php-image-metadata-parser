@@ -202,6 +202,8 @@ abstract class Image implements ImageInterface
         $size = getimagesize($fileName);
         $result->width = $size[0];
         $result->height = $size[1];
+        print('width: ' . $result->width . 'px' . PHP_EOL); // LA_TEMP
+        print('height: ' . $result->height . 'px' . PHP_EOL); // LA_TEMP
         return $result;
     }
 
