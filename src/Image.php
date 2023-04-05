@@ -135,8 +135,6 @@ abstract class Image implements ImageInterface
                         unset($idc_metadata_region['height']);
                         unset($idc_metadata_region['vertices']);
                         break;
-                        unset($idc_metadata_region['vertices']);
-                        break;
                     case ShapeFilter::POLYGON:
                         unset($idc_metadata_region['x']);
                         unset($idc_metadata_region['y']);
