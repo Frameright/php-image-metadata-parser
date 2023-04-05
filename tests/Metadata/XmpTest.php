@@ -1,9 +1,10 @@
 <?php
 namespace CSD\Image\Tests\Metadata;
 
-use CSD\Image\Metadata\JPEG;
-use CSD\Image\Metadata\JPEGSegment;
+use CSD\Image\Format\JPEG;
 use CSD\Image\Metadata\Xmp;
+use CSD\Image\Metadata\Xmp\ImageRegion;
+use CSD\Image\Metadata\Xmp\Point;
 
 /**
  * @coversDefaultClass \CSD\Image\Metadata\Xmp
@@ -283,6 +284,81 @@ class XmpTest extends \PHPUnit\Framework\TestCase
     public function testFromFile()
     {
         $this->assertInstanceOf(Xmp::class, Xmp::fromFile(__DIR__ . '/../Fixtures/all.XMP'));
+    }
+
+    /**
+     * @covers ::getImageRegions
+     */
+    public function testGetImageRegions()
+    {
+        $jpeg = JPEG::fromFile(
+            __DIR__ . '/../Fixtures/IPTC-PhotometadataRef-Std2021.1.jpg');
+        $xmp = $jpeg->getXmp();
+
+        $expectedRectangleRegion = new ImageRegion();
+        $expectedRectangleRegion->id = 'persltr2';
+        $expectedRectangleRegion->names = ['Listener 1'];
+        $expectedRectangleRegion->types = [
+            'Region Boundary Content Type Name (ref2021.1)',
+            'https://example.org/rctype/type2021.1a',
+            'https://example.org/rctype/type2021.1b',
+        ];
+        $expectedRectangleRegion->roles = [
+            'Region Boundary Content Role Name (ref2021.1)',
+            'https://example.org/rrole/role2021.1a',
+            'https://example.org/rrole/role2021.1b',
+        ];
+        $expectedRectangleRegion->rbShape = 'rectangle';
+        $expectedRectangleRegion->rbUnit = 'relative';
+        $expectedRectangleRegion->rbXY = new Point(0.31, 0.18);
+        $expectedRectangleRegion->rbH = 0.385;
+        $expectedRectangleRegion->rbW = 0.127;
+
+        $expectedCircleRegion = new ImageRegion();
+        $expectedCircleRegion->id = 'persltr3';
+        $expectedCircleRegion->names = ['Listener 2'];
+        $expectedCircleRegion->types = [
+            'Region Boundary Content Type Name (ref2021.1)',
+            'https://example.org/rctype/type2021.1a',
+            'https://example.org/rctype/type2021.1b',
+        ];
+        $expectedCircleRegion->roles = [
+            'Region Boundary Content Role Name (ref2021.1)',
+            'https://example.org/rrole/role2021.1a',
+            'https://example.org/rrole/role2021.1b',
+        ];
+        $expectedCircleRegion->rbShape = 'circle';
+        $expectedCircleRegion->rbUnit = 'relative';
+        $expectedCircleRegion->rbXY = new Point(0.59, 0.426);
+        $expectedCircleRegion->rbRx = 0.068;
+
+        $expectedPolygonRegion = new ImageRegion();
+        $expectedPolygonRegion->id = 'persltr1';
+        $expectedPolygonRegion->names = ['Speaker 1'];
+        $expectedPolygonRegion->types = [
+            'Region Boundary Content Type Name (ref2021.1)',
+            'https://example.org/rctype/type2021.1a',
+            'https://example.org/rctype/type2021.1b',
+        ];
+        $expectedPolygonRegion->roles = [
+            'Region Boundary Content Role Name (ref2021.1)',
+            'https://example.org/rrole/role2021.1a',
+            'https://example.org/rrole/role2021.1b',
+        ];
+        $expectedPolygonRegion->rbShape = 'polygon';
+        $expectedPolygonRegion->rbUnit = 'relative';
+        $expectedPolygonRegion->rbXY = new Point(null, null);
+        $expectedPolygonRegion->rbVertices = [
+            new Point(0.05, 0.713),
+            new Point(0.148, 0.041),
+            new Point(0.375, 0.863),
+        ];
+
+        $this->assertEquals([
+            $expectedRectangleRegion,
+            $expectedCircleRegion,
+            $expectedPolygonRegion,
+        ], $xmp->getImageRegions());
     }
 
     /**

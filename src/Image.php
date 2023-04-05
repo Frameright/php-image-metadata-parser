@@ -56,6 +56,18 @@ abstract class Image implements ImageInterface
     }
 
     /**
+     * @return array Array of integer values with the following keys: `width`
+     *               and `height`.
+     */
+    public function getSize()
+    {
+        return [
+            'width' => $this->width,
+            'height' => $this->height,
+        ];
+    }
+
+    /**
      * Helper method returning the result of Xmp::getImagesRegions() together
      * with additional information about the image, in a format close to what is
      * expected by the Image Display Control web component:
