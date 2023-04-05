@@ -760,8 +760,10 @@ class Xmp
     }
 
     /**
-     * @param string $shapeFilter
-     * @param string $roleFilter
+     * @param string $shapeFilter Can be used to retrieve only regions of a
+     *                            specific shape, e.g. ShapeFilter::RECTANGLE
+     * @param string $roleFilter Can be used to retrieve only regions with a
+     *                           specific role, e.g. RoleFilter::CROP
      *
      * @return array
      */
