@@ -30,4 +30,5 @@ git push --tags
 ```
 
 Packagist will automatically pick up the new tag and create a new release. See
-https://packagist.org/about
+https://packagist.org/about . Visit
+https://packagist.org/packages/frameright/image-metadata-parser to confirm.
