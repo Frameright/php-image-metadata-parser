@@ -127,3 +127,10 @@ composer install
 composer lint
 composer test
 ```
+
+See also [Contributing](docs/02_Contributing.md).
+
+## Changelog
+
+**1.0.0** (2023-04-10):
+  * Initial version.

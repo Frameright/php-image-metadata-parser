@@ -1,8 +1,8 @@
 {
     "name": "frameright/image-metadata-parser",
     "license": "MIT",
-    "keywords": ["Image", "Photo", "Metadata", "XMP", "IPTC", "Exif"],
-    "description": "Image metadata library",
+    "keywords": ["Image", "Photo", "Metadata", "XMP", "IPTC", "Exif", "Image Display Control", "IDC", "Frameright"],
+    "description": "Image metadata parsing library",
     "authors": [
         {
             "name": "Frameright (Coberg Ltd)",
@@ -27,7 +27,8 @@
         "psr-4": { "CSD\\Image\\": "src/" }
     },
     "require": {
-        "php": ">=5.5"
+        "php": ">=5.5",
+        "ext-xml": "*"
     },
     "require-dev": {
         "mockery/mockery": "~0.9",
