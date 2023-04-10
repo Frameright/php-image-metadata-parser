@@ -5,6 +5,8 @@ use CSD\Image\Format\JPEG;
 use CSD\Image\Metadata\Xmp;
 use CSD\Image\Metadata\Xmp\ImageRegion;
 use CSD\Image\Metadata\Xmp\Point;
+use CSD\Image\Metadata\Xmp\RoleFilter;
+use CSD\Image\Metadata\Xmp\ShapeFilter;
 
 /**
  * @coversDefaultClass \CSD\Image\Metadata\Xmp
@@ -359,6 +361,13 @@ class XmpTest extends \PHPUnit\Framework\TestCase
             $expectedCircleRegion,
             $expectedPolygonRegion,
         ], $xmp->getImageRegions());
+
+        $this->assertEquals([
+            $expectedRectangleRegion,
+        ], $xmp->getImageRegions(ShapeFilter::RECTANGLE));
+
+        $this->assertEquals([
+        ], $xmp->getImageRegions(ShapeFilter::RECTANGLE, RoleFilter::CROP));
     }
 
     /**
