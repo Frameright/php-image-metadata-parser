@@ -1,3 +1,5 @@
+[![Packagist Version](https://img.shields.io/packagist/v/frameright/image-metadata-parser)](https://packagist.org/packages/frameright/image-metadata-parser)
+
 # Image metadata parsing library (PHP 5.5+)
 
 > **NOTE**: this is based on
