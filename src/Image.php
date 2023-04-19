@@ -77,9 +77,9 @@ abstract class Image implements ImageInterface
      *                            specific shape, e.g. ShapeFilter::RECTANGLE
      * @param string $roleFilter Can be used to retrieve only regions with a
      *                           specific role, e.g. RoleFilter::CROP
-     * @param string $essentialOnly If true, only essential region properties
-     *                              will be returned, e.g. properties like
-     *                             `types` and `roles` will be skipped.
+     * @param bool $essentialOnly If true, only essential region properties will
+     *                            be returned, e.g. properties like `types` and
+     *                            `roles` will be skipped.
      *
      * @return array
      */
