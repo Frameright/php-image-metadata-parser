@@ -16,6 +16,9 @@ Supported image meta types:
    - IPTC
    - ~~EXIF~~
 
+> **NOTE**: a TypeScript equivalent of this library is available
+> [here](https://github.com/Frameright/image-display-control-metadata-parser).
+
 ## Installation
 
 Pull the library in your project  via [Composer](https://getcomposer.org/)
