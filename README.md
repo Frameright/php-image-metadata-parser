@@ -43,7 +43,9 @@ with the following `composer.json`:
 
 ## Usage
 
-See also [Getting Started](docs/01_Getting_Started.md).
+&emsp; :sparkles: [Getting started](docs/01_Getting_Started.md)
+
+&emsp; :memo: [Tutorial](https://www.frameright.io/post/metadata-in-php)
 
 ### Get metadata
 
