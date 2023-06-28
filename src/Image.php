@@ -71,7 +71,7 @@ abstract class Image implements ImageInterface
      * Helper method returning the result of Xmp::getImagesRegions() together
      * with additional information about the image, in a format close to what is
      * expected by the Image Display Control web component:
-     * https://github.com/Frameright/image-display-control-web-component/blob/main/image-display-control/docs/reference/attributes.md#data-image-regions
+     * https://docs.frameright.io/web-component/attribute-ref#data-image-regions
      *
      * @param string $shapeFilter Can be used to retrieve only regions of a
      *                            specific shape, e.g. ShapeFilter::RECTANGLE
@@ -104,7 +104,7 @@ abstract class Image implements ImageInterface
                 'unit' => $region->rbUnit,
 
                 // Useful when unit is 'pixel', see
-                // https://github.com/Frameright/image-display-control-web-component/blob/main/image-display-control/docs/reference/attributes.md
+                // https://docs.frameright.io/web-component/attribute-ref
                 'imageWidth' => $this->width,
                 'imageHeight' => $this->height,
 

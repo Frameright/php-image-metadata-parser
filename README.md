@@ -1,5 +1,12 @@
 [![Packagist Version](https://img.shields.io/packagist/v/frameright/image-metadata-parser)](https://packagist.org/packages/frameright/image-metadata-parser)
 
+<!--
+WARNING: Bits of information here are duplicated in several places:
+  * https://docs.frameright.io/php
+  * https://github.com/Frameright/php-image-metadata-parser
+Make sure to keep them in sync.
+-->
+
 # Image metadata parsing library (PHP 5.5+)
 
 > **NOTE**: this is based on
@@ -43,13 +50,13 @@ with the following `composer.json`:
 
 ## Usage
 
-&emsp; :sparkles: [Getting started](docs/01_Getting_Started.md)
+&emsp; :sparkles: [Getting started](https://docs.frameright.io/php/getting-started)
 
-&emsp; :wrench: [Contributing](docs/02_Contributing.md)
+&emsp; :wrench: [Contributing](https://docs.frameright.io/php/contributing)
 
 &emsp; :memo: [Tutorial](https://www.frameright.io/post/metadata-in-php)
 
-&emsp; 📝 [Changelog](docs/03_Changelog.md)
+&emsp; 📝 [Changelog](https://docs.frameright.io/php/changelog)
 
 ### Get metadata
 
