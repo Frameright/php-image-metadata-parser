@@ -15,8 +15,8 @@ composer test
 ### Changelog and version number
 
 Describe the changes made compared to the last released version in the
-[changelog](../README.md#Changelog). Browse the git history to make sure nothing
-has been left out.
+[changelog](03_Changelog.md). Browse the git history to make sure nothing has
+been left out.
 
 Choose the next version number according to the rules of
 [Semantic Versioning](https://semver.org/) and set it by creating a new git

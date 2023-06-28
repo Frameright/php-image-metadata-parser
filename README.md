@@ -45,7 +45,11 @@ with the following `composer.json`:
 
 &emsp; :sparkles: [Getting started](docs/01_Getting_Started.md)
 
+&emsp; :wrench: [Contributing](docs/02_Contributing.md)
+
 &emsp; :memo: [Tutorial](https://www.frameright.io/post/metadata-in-php)
+
+&emsp; 📝 [Changelog](docs/03_Changelog.md)
 
 ### Get metadata
 
@@ -124,20 +128,3 @@ $gps = $image->getAggregateMeta()->getGPS(); // checks EXIF and XMP
 
 $lat = $gps->getLatitude();
 ```
-
-## Contributing
-
-Run the linter and the unit tests with:
-
-```bash
-composer install
-composer lint
-composer test
-```
-
-See also [Contributing](docs/02_Contributing.md).
-
-## Changelog
-
-**1.0.0** (2023-04-10):
-  * Initial version.
