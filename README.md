@@ -9,6 +9,8 @@ Make sure to keep them in sync.
 
 # Image metadata parsing library (PHP 5.5+)
 
+> **➡️ See this document rendered at [docs.frameright.io/php](https://docs.frameright.io/php)**
+
 > **NOTE**: this is based on
 > [dchesterton/image](https://github.com/dchesterton/image). Many thanks to
   [dchesterton](https://github.com/dchesterton)!
