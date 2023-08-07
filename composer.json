@@ -31,7 +31,7 @@
         "ext-xml": "*"
     },
     "require-dev": {
-        "mockery/mockery": "~0.9",
+        "mockery/mockery": "~1.6",
         "phpunit/phpunit": "^9.5.25",
         "phpcompatibility/php-compatibility": "^9.3.5"
     },
