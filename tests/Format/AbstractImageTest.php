@@ -79,6 +79,8 @@ class AbstractImageTest extends \PHPUnit\Framework\TestCase
         $inputRectangleRegion->rbXY = new Point(0.31, 0.18);
         $inputRectangleRegion->rbH = 0.385;
         $inputRectangleRegion->rbW = 0.127;
+        $inputRectangleRegion->regionDefinitionId = 'rectangleregiondefid';
+        $inputRectangleRegion->regionName = 'rectangleregionname';
 
         $inputCircleRegion = new ImageRegion();
         $inputCircleRegion->id = 'persltr3';
@@ -97,6 +99,8 @@ class AbstractImageTest extends \PHPUnit\Framework\TestCase
         $inputCircleRegion->rbUnit = 'relative';
         $inputCircleRegion->rbXY = new Point(0.59, 0.426);
         $inputCircleRegion->rbRx = 0.068;
+        $inputCircleRegion->regionDefinitionId = 'circleregiondefid';
+        $inputCircleRegion->regionName = 'circleregionname';
 
         $inputPolygonRegion = new ImageRegion();
         $inputPolygonRegion->id = 'persltr1';
@@ -119,6 +123,8 @@ class AbstractImageTest extends \PHPUnit\Framework\TestCase
             new Point(0.148, 0.041),
             new Point(0.375, 0.863),
         ];
+        $inputPolygonRegion->regionDefinitionId = 'polygonregiondefid';
+        $inputPolygonRegion->regionName = 'polygonregionname';
 
         $xmp->expects($this->atLeastOnce())->method('getImageRegions')->with(
             ShapeFilter::ANY,
@@ -152,6 +158,8 @@ class AbstractImageTest extends \PHPUnit\Framework\TestCase
             'height' => 0.385,
             'radius' => null,
             'vertices' => [],
+            'regionDefinitionId' => 'rectangleregiondefid',
+            'regionName' => 'rectangleregionname',
         ];
 
         $expectedCircleRegion = [
@@ -177,6 +185,8 @@ class AbstractImageTest extends \PHPUnit\Framework\TestCase
             'height' => null,
             'radius' => 0.068,
             'vertices' => [],
+            'regionDefinitionId' => 'circleregiondefid',
+            'regionName' => 'circleregionname',
         ];
 
         $expectedPolygonRegion = [
@@ -215,6 +225,8 @@ class AbstractImageTest extends \PHPUnit\Framework\TestCase
                     'y' => 0.863,
                 ],
             ],
+            'regionDefinitionId' => 'polygonregiondefid',
+            'regionName' => 'polygonregionname',
         ];
 
         $this->assertEquals([

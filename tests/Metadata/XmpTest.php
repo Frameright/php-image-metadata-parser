@@ -371,6 +371,39 @@ class XmpTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @covers ::getImageRegions
+     */
+    public function testGetImageRegionFromFramerightImage()
+    {
+        $jpeg = JPEG::fromFile(
+            __DIR__ . '/../Fixtures/frameright.jpg');
+
+
+        $xmp = $jpeg->getXmp();
+
+        $expectedRegion = new ImageRegion();
+        $expectedRegion->regionDefinitionId = 'definition-7a54f275-6872-435e-befc-b52d97653a28';
+        $expectedRegion->regionName = '4:3 Horizontal';
+        $expectedRegion->id = 'crop-e789b6b8-ee15-45c0-a0c5-3ad38858db14';
+        $expectedRegion->names = null;
+        $expectedRegion->types = null;
+        $expectedRegion->roles = [
+            'http://cv.iptc.org/newscodes/imageregionrole/cropping',
+        ];
+        $expectedRegion->rbShape = 'rectangle';
+        $expectedRegion->rbUnit = 'relative';
+        $expectedRegion->rbXY = new Point(0.0375, 0);
+        $expectedRegion->rbRx = null;
+        $expectedRegion->rbH = '1';
+        $expectedRegion->rbW = '0.8890625';
+
+        $this->assertEquals([
+            $expectedRegion,
+        ], $xmp->getImageRegions());
+
+    }
+
+    /**
      * @param Xmp $xmp
      */
     private function assertXmpContainsProcessingInstructions(Xmp $xmp)

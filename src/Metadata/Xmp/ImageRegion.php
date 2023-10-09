@@ -80,6 +80,21 @@ class ImageRegion
      */
     public $rbVertices;
 
+
+    /**
+     * Region's definition ID from the Frameright service.
+     *
+     * @var string|null
+     */
+    public $regionDefinitionId;
+
+    /**
+     * Region's definition name from the Frameright service.
+     *
+     * @var string|null
+     */
+    public $regionName;
+
     /**
      * Initialize members if a node is provided.
      *
@@ -108,6 +123,18 @@ class ImageRegion
         $this->roles = self::getEntityOrConceptValues(
             $xpath,
             'Iptc4xmpExt:rRole',
+            $node
+        );
+
+        $this->regionDefinitionId = self::getNodeValue(
+            $xpath,
+            'FramerightIdc:RegionDefinitionId',
+            $node
+        );
+
+        $this->regionName = self::getNodeValue(
+            $xpath,
+            'FramerightIdc:RegionName',
             $node
         );
 

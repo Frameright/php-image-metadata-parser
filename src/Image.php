@@ -117,6 +117,9 @@ abstract class Image implements ImageInterface
                 'radius' => $region->rbRx,
 
                 'vertices' => [],
+
+                'regionDefinitionId' => $region->regionDefinitionId,
+                'regionName' => $region->regionName,
             ];
 
             if ($region->rbVertices) {
