@@ -245,6 +245,8 @@ class AbstractImageTest extends \PHPUnit\Framework\TestCase
         unset($expectedRectangleRegion['imageHeight']);
         unset($expectedRectangleRegion['radius']);
         unset($expectedRectangleRegion['vertices']);
+        unset($expectedRectangleRegion['regionDefinitionId']);
+        unset($expectedRectangleRegion['regionName']);
 
         unset($expectedCircleRegion['types']);
         unset($expectedCircleRegion['roles']);
@@ -253,6 +255,8 @@ class AbstractImageTest extends \PHPUnit\Framework\TestCase
         unset($expectedCircleRegion['width']);
         unset($expectedCircleRegion['height']);
         unset($expectedCircleRegion['vertices']);
+        unset($expectedCircleRegion['regionDefinitionId']);
+        unset($expectedCircleRegion['regionName']);
 
         unset($expectedPolygonRegion['types']);
         unset($expectedPolygonRegion['roles']);
@@ -263,6 +267,8 @@ class AbstractImageTest extends \PHPUnit\Framework\TestCase
         unset($expectedPolygonRegion['width']);
         unset($expectedPolygonRegion['height']);
         unset($expectedPolygonRegion['radius']);
+        unset($expectedPolygonRegion['regionDefinitionId']);
+        unset($expectedPolygonRegion['regionName']);
 
         $this->assertEquals([
             $expectedRectangleRegion,

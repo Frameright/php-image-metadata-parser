@@ -134,6 +134,8 @@ abstract class Image implements ImageInterface
             if ($essentialOnly) {
                 unset($idc_metadata_region['types']);
                 unset($idc_metadata_region['roles']);
+                unset($idc_metadata_region['regionDefinitionId']);
+                unset($idc_metadata_region['regionName']);
 
                 if ($idc_metadata_region['unit'] === 'relative') {
                     unset($idc_metadata_region['imageWidth']);
