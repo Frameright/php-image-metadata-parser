@@ -53,6 +53,11 @@ class Xmp
     const PHOTO_MECHANIC_NS = "http://ns.camerabits.com/photomechanic/1.0/";
 
     /**
+     *
+     */
+    const FRAMERIGHT_IDC_NS = 'http://ns.frameright.io/idc/1.0/';
+
+    /**
      * @var \DomDocument
      */
     private $dom;
@@ -80,6 +85,7 @@ class Xmp
         'xmpRights' => self::XMP_RIGHTS_NS,
         'Iptc4xmpCore' => self::IPTC4_XMP_CORE_NS,
         'Iptc4xmpExt' => self::IPTC4_XMP_EXT_NS,
+        'FramerightIdc' => self::FRAMERIGHT_IDC_NS,
         'photomechanic' => self::PHOTO_MECHANIC_NS
     ];
 
