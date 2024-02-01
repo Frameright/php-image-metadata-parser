@@ -109,54 +109,60 @@ class ImageRegion
             return;
         }
 
-        $this->id = self::getNodeValue($xpath, 'Iptc4xmpExt:rId', $node);
+        $this->id = self::getChildValueOrAttr($xpath, 'Iptc4xmpExt:rId', $node);
+
+        $xpathNames = "Iptc4xmpExt:Name/rdf:Alt/rdf:li";
         $this->names = self::getNodeValues(
             $xpath,
-            'Iptc4xmpExt:Name/rdf:Alt/rdf:li',
+            // Matches only children and grand-children, not deeper:
+            "./$xpathNames|./*/$xpathNames",
             $node
         );
+
         $this->types = self::getEntityOrConceptValues(
             $xpath,
-            'Iptc4xmpExt:rCtype',
+            './/Iptc4xmpExt:rCtype', // matches any descendant with this name
             $node
         );
         $this->roles = self::getEntityOrConceptValues(
             $xpath,
-            'Iptc4xmpExt:rRole',
+            './/Iptc4xmpExt:rRole', // matches any descendant with this name
             $node
         );
 
-        $this->regionDefinitionId = self::getNodeValue(
+        $this->regionDefinitionId = self::getChildValueOrAttr(
             $xpath,
             'FramerightIdc:RegionDefinitionId',
             $node
         );
 
-        $this->regionName = self::getNodeValue(
+        $this->regionName = self::getChildValueOrAttr(
             $xpath,
             'FramerightIdc:RegionName',
             $node
         );
 
-        $xpathToRb = 'Iptc4xmpExt:RegionBoundary';
-
-        foreach ([
-            'rbShape',
-            'rbUnit',
-            'rbH',
-            'rbW',
-            'rbRx',
-        ] as $property) {
-            $this->$property = self::getNodeValue(
-                $xpath,
-                "$xpathToRb/Iptc4xmpExt:$property",
-                $node
-            );
+        $xpathToRb = './/Iptc4xmpExt:RegionBoundary'; // matches any descendant with this name
+        $rbNode = $xpath->query($xpathToRb, $node)->item(0);
+        if ($rbNode) {
+            foreach ([
+                'rbShape',
+                'rbUnit',
+                'rbH',
+                'rbW',
+                'rbRx',
+            ] as $property) {
+                $this->$property = self::getChildValueOrAttr(
+                    $xpath,
+                    "Iptc4xmpExt:$property",
+                    $rbNode
+                );
+            }
         }
 
         $this->rbXY = new Point(
-            self::getNodeValue($xpath, "$xpathToRb/Iptc4xmpExt:rbX", $node),
-            self::getNodeValue($xpath, "$xpathToRb/Iptc4xmpExt:rbY", $node)
+            self::getChildValueOrAttr($xpath, "Iptc4xmpExt:rbX", $rbNode),
+            self::getChildValueOrAttr($xpath, "Iptc4xmpExt:rbY", $rbNode)
         );
 
         $verticesNodes = $xpath->query(
@@ -167,8 +173,8 @@ class ImageRegion
             $this->rbVertices = [];
             foreach ($verticesNodes as $verticesNode) {
                 $point = new Point(
-                    self::getNodeValue($xpath, "Iptc4xmpExt:rbX", $verticesNode),
-                    self::getNodeValue($xpath, "Iptc4xmpExt:rbY", $verticesNode)
+                    self::getChildValueOrAttr($xpath, "Iptc4xmpExt:rbX", $verticesNode),
+                    self::getChildValueOrAttr($xpath, "Iptc4xmpExt:rbY", $verticesNode)
                 );
                 array_push($this->rbVertices, $point);
             }
@@ -203,8 +209,10 @@ class ImageRegion
     }
 
     /**
+     * Get the value of the first node matching the given XPath expression.
+     *
      * @param \DOMXPath $xpath
-     * @param string $expression XPath expression leading to one single node.
+     * @param string $expression XPath expression.
      * @param \DOMNode $contextNode
      *
      * @return string|null
@@ -212,6 +220,47 @@ class ImageRegion
     private static function getNodeValue($xpath, $expression, $contextNode) {
         $node = $xpath->query($expression, $contextNode)->item(0);
         return $node ? $node->nodeValue : null;
+    }
+
+    /**
+     * Attempts to find a value in the following order:
+     * 1. First direct child node having the given name.
+     * 2. Context node's attribute with this name.
+     * 3. First direct child node's attribute with this name.
+     *
+     * @param \DOMXPath $xpath
+     * @param string $nodeOrAttrName
+     * @param \DOMNode $contextNode
+     *
+     * @return string|null
+     */
+    private static function getChildValueOrAttr($xpath, $nodeOrAttrName, $contextNode) {
+        $childValue = self::getNodeValue($xpath, $nodeOrAttrName, $contextNode);
+        if ($childValue) {
+            return $childValue;
+        }
+
+        $attrNameWithoutNamespace = preg_replace('/^.*:/', '', $nodeOrAttrName);
+        $contextNodeAttrs = $contextNode->attributes;
+        if ($contextNodeAttrs) {
+            $contextNodeAttr = $contextNodeAttrs->getNamedItem($attrNameWithoutNamespace);
+            if ($contextNodeAttr) {
+                return $contextNodeAttr->nodeValue;
+            }
+        }
+
+        $childNodeWithAttr = $xpath->query("*[@$nodeOrAttrName]", $contextNode)->item(0);
+        if (!$childNodeWithAttr) {
+            return null;
+        }
+
+        $childNodeAttrs = $childNodeWithAttr->attributes;
+        if (!$childNodeAttrs) {
+            return null;
+        }
+
+        $childNodeAttr = $childNodeAttrs->getNamedItem($attrNameWithoutNamespace);
+        return $childNodeAttr->nodeValue;
     }
 
     /**
