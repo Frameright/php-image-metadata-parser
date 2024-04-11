@@ -1,0 +1,5 @@
+{
+    "require": {
+        "frameright/image-metadata-parser": "^1.1"
+    }
+}
