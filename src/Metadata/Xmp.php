@@ -158,6 +158,8 @@ class Xmp
     }
 
     /**
+     * Returns the first node (element or attribute) with the given field name and namespace.
+     *
      * @param      $field
      * @param      $ns
      * @param bool $checkAttributes
@@ -166,14 +168,15 @@ class Xmp
      */
     private function getNode($field, $ns, $checkAttributes = true)
     {
-        $rdfDesc = $this->getRDFDescription($ns);
-
         // check for field as an element or an attribute
         $query = ($checkAttributes)? $field . '|@' . $field: $field;
-        $result = $this->xpath->query($query, $rdfDesc);
 
-        if ($result->length) {
-            return $result->item(0);
+        $rdfDescriptions = $this->getRDFDescriptions($ns);
+        foreach($rdfDescriptions as $rdfDesc) {
+            $result = $this->xpath->query($query, $rdfDesc);
+            if ($result->length) {
+                return $result->item(0);
+            }
         }
 
         return null;
@@ -267,29 +270,28 @@ class Xmp
 
         return null;
     }
-
     /**
+     * Returns all `rdf:Description` elements with the given namespace.
+     *
      * @param $namespace
      *
-     * @return \DOMNode|null
+     * @return array Array of \DOMNode
      */
-    private function getRDFDescription($namespace)
+    private function getRDFDescriptions($namespace)
     {
-        // element
-        $description = $this->xpath->query("//rdf:Description[*[namespace-uri()='$namespace']]");
+        $result = [];
 
-        if ($description->length > 0) {
-            return $description->item(0);
+        $element_query = "//rdf:Description[*[namespace-uri()='$namespace']]";
+        $attribute_query = "//rdf:Description[@*[namespace-uri()='$namespace']]";
+        foreach([$element_query, $attribute_query] as $query) {
+            $description = $this->xpath->query($query);
+
+            if ($description->length > 0) {
+                $result = array_merge($result, iterator_to_array($description));
+            }
         }
 
-        // attribute
-        $description = $this->xpath->query("//rdf:Description[@*[namespace-uri()='$namespace']]");
-
-        if ($description->length > 0) {
-            return $description->item(0);
-        }
-
-        return null;
+        return $result;
     }
 
     /**

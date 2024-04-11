@@ -455,6 +455,49 @@ class XmpTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @covers ::getImageRegions
+     *
+     * The RDF/XML structure might contain several instances of
+     * <rdf:Description xmlns:Iptc4xmpExt="...">. This test validates that we
+     * find the image regions even when they are not located in the first
+     * <rdf:Description> element.
+     *
+     * See https://github.com/Frameright/php-image-metadata-parser/issues/25
+     */
+    public function testGetImageRegionFromImageWithMultipleRdfDescriptions()
+    {
+        // FIXME This test is disabled because we need a corresponding test fixture.
+        // See https://github.com/Frameright/php-image-metadata-parser/issues/25
+        return true;
+
+        $jpeg = JPEG::fromFile(
+            __DIR__ . '/../Fixtures/multipleRdfDesc.jpg');
+
+        $xmp = $jpeg->getXmp();
+
+        $expectedFirstRegion = new ImageRegion();
+        $expectedFirstRegion->regionDefinitionId = 'definition-0dae7c70-f936-49ad-80d2-a9f0f6c0fcdb';
+        $expectedFirstRegion->regionName = '1:1 Square (Common sizes)';
+        $expectedFirstRegion->id = 'crop-0fd40a5b-ad5f-4b29-9ab2-43afc21b44a6';
+        $expectedFirstRegion->names = null;
+        $expectedFirstRegion->types = null;
+        $expectedFirstRegion->roles = [
+            'http://cv.iptc.org/newscodes/imageregionrole/cropping',
+        ];
+        $expectedFirstRegion->rbShape = 'rectangle';
+        $expectedFirstRegion->rbUnit = 'relative';
+        $expectedFirstRegion->rbXY = new Point(0.11890472618154539, 0.13225);
+        $expectedFirstRegion->rbRx = null;
+        $expectedFirstRegion->rbH = '0.4785';
+        $expectedFirstRegion->rbW = '0.7179294823705926';
+
+        $this->assertEquals(
+            $expectedFirstRegion,
+            $xmp->getImageRegions()[0]
+        );
+    }
+
+    /**
      * @param Xmp $xmp
      */
     private function assertXmpContainsProcessingInstructions(Xmp $xmp)
