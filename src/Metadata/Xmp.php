@@ -293,45 +293,6 @@ class Xmp
     }
 
     /**
-     * @param $namespace
-     *
-     * @return \DOMElement|\DOMNode|null
-     */
-    private function getOrCreateRDFDescription($namespace)
-    {
-        $desc = $this->getRDFDescription($namespace);
-
-        if ($desc) {
-            return $desc;
-        }
-
-        // try and find any rdf:Description, and add to that
-        $desc = $this->xpath->query('//rdf:Description')->item(0);
-
-        if ($desc) {
-            return $desc;
-        }
-
-        // no rdf:Description's, create new
-        $prefix = array_search($namespace, $this->namespaces);
-
-        $desc = $this->dom->createElementNS(self::RDF_NS, 'rdf:Description');
-        $desc->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:' . $prefix, $namespace);
-
-        $rdf = $this->xpath->query('rdf:RDF', $this->dom->documentElement)->item(0);
-
-        // check if rdf:RDF element exists, and create it if not
-        if (!$rdf) {
-            $rdf = $this->dom->createElementNS(self::RDF_NS, 'rdf:RDF');
-            $this->dom->documentElement->appendChild($rdf);
-        }
-
-        $rdf->appendChild($desc);
-
-        return $desc;
-    }
-
-    /**
      * @return string
      */
     public function getHeadline()
