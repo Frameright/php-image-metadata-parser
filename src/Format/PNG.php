@@ -105,6 +105,16 @@ class PNG extends Image
     }
 
     /**
+     * @param $string
+     *
+     * @return PNG
+     */
+    public static function fromString($string)
+    {
+        return new self($string);
+    }
+
+    /**
      * @param string $contents
      *
      * @throws \Exception

@@ -5,63 +5,186 @@ namespace CSD\Image\Tests\Format;
 use CSD\Image\Format\WebP;
 use CSD\Image\Metadata\Exif;
 use CSD\Image\Metadata\Xmp;
+use CSD\Image\Metadata\UnsupportedException;
 
 /**
- * @author Daniel Chesterton <daniel@chestertondevelopment.com>
- *
  * @coversDefaultClass \CSD\Image\Format\WebP
  */
 class WebPTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * Test that a non-WebP file throws an exception.
+     * Data provider for valid WebP tests.
      *
-     * @covers ::fromFile
-     * @covers ::__construct
+     * @return array
      */
-    public function testFromFileInvalidWebP()
+    public function providerTestValidWebP()
     {
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Invalid WebP file');
-        WebP::fromFile(__DIR__ . '/../Fixtures/nometa.jpg');
+        return [
+            // [method, filename, expectedHeadline]
+            ['fromFile', 'meta.webp', 'Headline'],
+            ['fromString', 'meta.webp', 'Headline'],
+        ];
     }
 
-    public function testFromFile()
+    /**
+     * Test that WebP can read XMP data using both fromFile and fromString methods.
+     *
+     * @dataProvider providerTestValidWebP
+     *
+     * @param string $method           The method to use ('fromFile' or 'fromString')
+     * @param string $filename         The filename of the test image
+     * @param string $expectedHeadline The expected headline in the XMP data
+     */
+    public function testValidWebP($method, $filename, $expectedHeadline)
     {
-        $webp = WebP::fromFile(__DIR__ . '/../Fixtures/meta.webp');
+        $filePath = __DIR__ . '/../Fixtures/' . $filename;
+
+        if ($method === 'fromFile') {
+            $webp = WebP::fromFile($filePath);
+        } elseif ($method === 'fromString') {
+            $string = file_get_contents($filePath);
+            $webp = WebP::fromString($string);
+        } else {
+            throw new \InvalidArgumentException("Invalid method: $method");
+        }
+
         $this->assertInstanceOf(WebP::class, $webp);
 
         $xmp = $webp->getXmp();
 
-        $this->assertInstanceOf(XMP::class, $xmp);
-        $this->assertSame('Headline', $xmp->getHeadline());
+        $this->assertInstanceOf(Xmp::class, $xmp);
+        $this->assertSame($expectedHeadline, $xmp->getHeadline());
     }
 
-    public function testGetExif()
+    /**
+     * Data provider for invalid WebP tests.
+     *
+     * @return array
+     */
+    public function providerTestInvalidWebP()
     {
-        $webp = WebP::fromFile(__DIR__ . '/../Fixtures/exif.webp');
+        return [
+            // [method, filename, expectedExceptionMessage]
+            ['fromFile', 'nometa.jpg', 'Invalid WebP file'],
+            ['fromString', 'nometa.jpg', 'Invalid WebP file'],
+        ];
+    }
+
+    /**
+     * Test that a non-WebP file throws an exception.
+     *
+     * @dataProvider providerTestInvalidWebP
+     *
+     * @param string $method                  The method to use ('fromFile' or 'fromString')
+     * @param string $filename                The filename of the test image
+     * @param string $expectedExceptionMessage The expected exception message
+     */
+    public function testInvalidWebP($method, $filename, $expectedExceptionMessage)
+    {
+        $filePath = __DIR__ . '/../Fixtures/' . $filename;
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage($expectedExceptionMessage);
+
+        if ($method === 'fromFile') {
+            WebP::fromFile($filePath);
+        } elseif ($method === 'fromString') {
+            $string = file_get_contents($filePath);
+            WebP::fromString($string);
+        } else {
+            throw new \InvalidArgumentException("Invalid method: $method");
+        }
+    }
+
+    /**
+     * Data provider for Exif tests.
+     *
+     * @return array
+     */
+    public function providerTestGetExif()
+    {
+        return [
+            // [method, filename]
+            ['fromFile', 'exif.webp'],
+            ['fromString', 'exif.webp'],
+        ];
+    }
+
+    /**
+     * Test that Exif data can be retrieved from WebP files.
+     *
+     * @dataProvider providerTestGetExif
+     *
+     * @param string $method   The method to use ('fromFile' or 'fromString')
+     * @param string $filename The filename of the test image
+     */
+    public function testGetExif($method, $filename)
+    {
+        $filePath = __DIR__ . '/../Fixtures/' . $filename;
+
+        if ($method === 'fromFile') {
+            $webp = WebP::fromFile($filePath);
+        } elseif ($method === 'fromString') {
+            $string = file_get_contents($filePath);
+            $webp = WebP::fromString($string);
+        } else {
+            throw new \InvalidArgumentException("Invalid method: $method");
+        }
+
         $exif = $webp->getExif();
 
         $this->assertInstanceOf(Exif::class, $exif);
 
-        // todo: test actual value of exif
+        // TODO: Add assertions to test actual Exif data
     }
 
     /**
-     * @covers ::getIptc
+     * Data provider for unsupported metadata tests.
+     *
+     * @return array
      */
-    public function testGetIptc()
+    public function providerTestUnsupportedMetadata()
     {
-        $this->expectException(\CSD\Image\Metadata\UnsupportedException::class);
-        $this->expectExceptionMessage('WebP files do not support IPTC metadata');
-        $webp = WebP::fromFile(__DIR__ . '/../Fixtures/meta.webp');
-        $webp->getIptc();
+        return [
+            // [method, filename, metadataMethod, expectedExceptionMessage]
+            ['fromFile', 'meta.webp', 'getIptc', 'WebP files do not support IPTC metadata'],
+            ['fromString', 'meta.webp', 'getIptc', 'WebP files do not support IPTC metadata'],
+        ];
+    }
+
+    /**
+     * Test that calling unsupported metadata methods throws an exception.
+     *
+     * @dataProvider providerTestUnsupportedMetadata
+     *
+     * @param string $method                   The method to use ('fromFile' or 'fromString')
+     * @param string $filename                 The filename of the test image
+     * @param string $metadataMethod           The metadata method to call ('getIptc')
+     * @param string $expectedExceptionMessage The expected exception message
+     */
+    public function testUnsupportedMetadata($method, $filename, $metadataMethod, $expectedExceptionMessage)
+    {
+        $filePath = __DIR__ . '/../Fixtures/' . $filename;
+
+        $this->expectException(UnsupportedException::class);
+        $this->expectExceptionMessage($expectedExceptionMessage);
+
+        if ($method === 'fromFile') {
+            $webp = WebP::fromFile($filePath);
+        } elseif ($method === 'fromString') {
+            $string = file_get_contents($filePath);
+            $webp = WebP::fromString($string);
+        } else {
+            throw new \InvalidArgumentException("Invalid method: $method");
+        }
+
+        $webp->$metadataMethod();
     }
 
     public function ttestSimpleUnsupported()  # FIXME - this test fails
     {
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Only extended WebP format is supported');
-        WebP::fromFile(__DIR__ . '/../Fixtures/simple.webp');
-    }
+        $image = WebP::fromFile(__DIR__ . '/../Fixtures/simple.webp');
+     }
 }

@@ -144,8 +144,17 @@ class WebP extends Image
      */
     public static function fromFile($filename)
     {
-        // var_dump($filename);
         return new self(file_get_contents($filename));
+    }
+
+    /**
+     * @param $string
+     *
+     * @return PNG
+     */
+    public static function fromString($string)
+    {
+        return new self($string);
     }
 
     /**

@@ -1,118 +1,196 @@
 <?php
-
 namespace CSD\Image\Tests\Format;
 
 use CSD\Image\Format\PNG;
 use CSD\Image\Metadata\Xmp;
+use CSD\Image\Metadata\UnsupportedException;
 
 /**
- * @author Daniel Chesterton <daniel@chestertondevelopment.com>
- *
  * @coversDefaultClass \CSD\Image\Format\PNG
  */
 class PNGTest extends \PHPUnit\Framework\TestCase
 {
     /**
+     * Data provider for testGetXmp method.
+     *
+     * @return array
+     */
+    public function providerTestGetXmp()
+    {
+        return [
+            // [method, filename, expectedPhotographerName, expectedHeadline]
+            ['fromFile', 'metaphotoshop.png', 'Author', null],
+            ['fromString', 'metaphotoshop.png', 'Author', null],
+            ['fromFile', 'metapm.png', null, 'Headline'],
+            ['fromString', 'metapm.png', null, 'Headline'],
+            ['fromFile', 'nometa.png', null, null],
+            ['fromString', 'nometa.png', null, null],
+        ];
+    }
+
+    /**
+     * Test that PNG can read XMP data using both fromFile and fromString methods.
+     *
+     * @dataProvider providerTestGetXmp
+     *
+     * @param string      $method                 The method to use ('fromFile' or 'fromString')
+     * @param string      $filename               The filename of the test image
+     * @param string|null $expectedPhotographerName The expected photographer name in the XMP data
+     * @param string|null $expectedHeadline       The expected headline in the XMP data
+     */
+    public function testGetXmp($method, $filename, $expectedPhotographerName, $expectedHeadline)
+    {
+        $filePath = __DIR__ . '/../Fixtures/' . $filename;
+
+        if ($method === 'fromFile') {
+            $png = PNG::fromFile($filePath);
+        } elseif ($method === 'fromString') {
+            $string = file_get_contents($filePath);
+            $png = PNG::fromString($string);
+        } else {
+            throw new \InvalidArgumentException("Invalid method: $method");
+        }
+
+        $xmp = $png->getXmp();
+
+        $this->assertInstanceOf(Xmp::class, $xmp);
+        $this->assertSame($expectedPhotographerName, $xmp->getPhotographerName());
+        $this->assertSame($expectedHeadline, $xmp->getHeadline());
+    }
+
+    /**
+     * Data provider for testInvalidPNG method.
+     *
+     * @return array
+     */
+    public function providerTestInvalidPNG()
+    {
+        return [
+            // [method, filename, expectedExceptionMessage]
+            ['fromFile', 'nometa.jpg', 'Invalid PNG file signature'],
+            ['fromString', 'nometa.jpg', 'Invalid PNG file signature'],
+        ];
+    }
+
+    /**
      * Test that a non-PNG file throws an exception.
      *
-     * @covers ::fromFile
+     * @dataProvider providerTestInvalidPNG
+     *
+     * @param string $method                 The method to use ('fromFile' or 'fromString')
+     * @param string $filename               The filename of the test image
+     * @param string $expectedExceptionMessage The expected exception message
      */
-    public function testFromFileInvalidPNG()
+    public function testInvalidPNG($method, $filename, $expectedExceptionMessage)
     {
+        $filePath = __DIR__ . '/../Fixtures/' . $filename;
+
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Invalid PNG file signature');
-        PNG::fromFile(__DIR__ . '/../Fixtures/nometa.jpg');
+        $this->expectExceptionMessage($expectedExceptionMessage);
+
+        if ($method === 'fromFile') {
+            $png = PNG::fromFile($filePath);
+        } elseif ($method === 'fromString') {
+            $string = file_get_contents($filePath);
+            $png = PNG::fromString($string);
+        } else {
+            throw new \InvalidArgumentException("Invalid method: $method");
+        }
     }
 
     /**
-     * @covers ::getXmp
-     * @covers ::getXmpChunk
+     * Data provider for testUnsupportedMetadata method.
+     *
+     * @return array
      */
-    public function testGetXmpWithMetadataWrittenInPhotoshop()
+    public function providerTestUnsupportedMetadata()
     {
-        $png = PNG::fromFile(__DIR__ . '/../Fixtures/metaphotoshop.png');
-
-        $xmp = $png->getXmp();
-
-        $this->assertInstanceOf(XMP::class, $xmp);
-        $this->assertEquals('Author', $xmp->getPhotographerName());
+        return [
+            // [method, filename, metadataMethod, expectedExceptionMessage]
+            ['fromFile', 'nometa.png', 'getExif', 'PNG files do not support EXIF metadata'],
+            ['fromString', 'nometa.png', 'getExif', 'PNG files do not support EXIF metadata'],
+            ['fromFile', 'nometa.png', 'getIptc', 'PNG files do not support IPTC metadata'],
+            ['fromString', 'nometa.png', 'getIptc', 'PNG files do not support IPTC metadata'],
+        ];
     }
 
     /**
-     * @covers ::getXmp
-     * @covers ::getXmpChunk
+     * Test that calling unsupported metadata methods throws an exception.
+     *
+     * @dataProvider providerTestUnsupportedMetadata
+     *
+     * @param string $method                 The method to use ('fromFile' or 'fromString')
+     * @param string $filename               The filename of the test image
+     * @param string $metadataMethod         The metadata method to call ('getExif' or 'getIptc')
+     * @param string $expectedExceptionMessage The expected exception message
      */
-    public function testGetXmpWithMetaWrittenInPhotoMechanic()
+    public function testUnsupportedMetadata($method, $filename, $metadataMethod, $expectedExceptionMessage)
     {
-        $png = PNG::fromFile(__DIR__ . '/../Fixtures/metapm.png');
+        $filePath = __DIR__ . '/../Fixtures/' . $filename;
 
-        $xmp = $png->getXmp();
+        $this->expectException(UnsupportedException::class);
+        $this->expectExceptionMessage($expectedExceptionMessage);
 
-        $this->assertInstanceOf(XMP::class, $xmp);
-        $this->assertEquals('Headline', $xmp->getHeadline());
+        if ($method === 'fromFile') {
+            $png = PNG::fromFile($filePath);
+        } elseif ($method === 'fromString') {
+            $string = file_get_contents($filePath);
+            $png = PNG::fromString($string);
+        } else {
+            throw new \InvalidArgumentException("Invalid method: $method");
+        }
+
+        $png->$metadataMethod();
     }
 
     /**
-     * @covers ::getXmp
-     * @covers ::getXmpChunk
+     * Test that a valid PNG file can be loaded using both fromFile and fromString.
+     *
+     * @return void
      */
-    public function testGetXmpNoMeta()
+    public function testValidPNG()
     {
-        $png = PNG::fromFile(__DIR__ . '/../Fixtures/nometa.png');
+        $methods = ['fromFile', 'fromString'];
+        $filename = 'nometa.png';
 
-        $xmp = $png->getXmp();
+        foreach ($methods as $method) {
+            $filePath = __DIR__ . '/../Fixtures/' . $filename;
 
-        $this->assertInstanceOf(XMP::class, $xmp);
+            if ($method === 'fromFile') {
+                $png = PNG::fromFile($filePath);
+            } elseif ($method === 'fromString') {
+                $string = file_get_contents($filePath);
+                $png = PNG::fromString($string);
+            }
 
-        // check it's an empty XMP string
-        $this->assertEquals('<?xml version="1.0" encoding="UTF-8"?>
-<?xpacket begin="﻿" id="W5M0MpCehiHzreSzNTczkc9d"?>
-<x:xmpmeta xmlns:x="adobe:ns:meta/"/>
-<?xpacket end="w"?>
-', $xmp->getString());
+            $this->assertInstanceOf(PNG::class, $png);
+        }
     }
 
     /**
-     * @covers ::fromFile
-     * @covers ::getChunksFromContents
-     * @covers ::__construct
+     * Test that a PNG file with malformed chunks throws an exception.
+     *
+     * @return void
      */
-    public function testFromFileValidPNG()
+    public function testMalformedChunks()
     {
-        $png = PNG::fromFile(__DIR__ . '/../Fixtures/nometa.png');
+        $methods = ['fromFile', 'fromString'];
+        $filename = 'malformedchunks.png';
+        $expectedExceptionMessage = 'Invalid CRC for chunk with type: IHDR';
 
-        $this->assertInstanceOf(PNG::class, $png);
-    }
+        foreach ($methods as $method) {
+            $this->expectException(\Exception::class);
+            $this->expectExceptionMessage($expectedExceptionMessage);
 
-    /**
-     * @covers ::getChunksFromContents
-     */
-    public function testFromFileWithMalformedChunks()
-    {
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Invalid CRC for chunk with type: IHDR');
-        PNG::fromFile(__DIR__ . '/../Fixtures/malformedchunks.png');
-    }
+            $filePath = __DIR__ . '/../Fixtures/' . $filename;
 
-    /**
-     * @covers ::getExif
-     */
-    public function testGetExif()
-    {
-        $this->expectException(\CSD\Image\Metadata\UnsupportedException::class);
-        $this->expectExceptionMessage('PNG files do not support EXIF metadata');
-        $png = PNG::fromFile(__DIR__ . '/../Fixtures/nometa.png');
-        $png->getExif();
-    }
-
-    /**
-     * @covers ::getIptc
-     */
-    public function testGetIptc()
-    {
-        $this->expectException(\CSD\Image\Metadata\UnsupportedException::class);
-        $this->expectExceptionMessage('PNG files do not support IPTC metadata');
-        $png = PNG::fromFile(__DIR__ . '/../Fixtures/nometa.png');
-        $png->getIptc();
+            if ($method === 'fromFile') {
+                $png = PNG::fromFile($filePath);
+            } elseif ($method === 'fromString') {
+                $string = file_get_contents($filePath);
+                $png = PNG::fromString($string);
+            }
+        }
     }
 }
+

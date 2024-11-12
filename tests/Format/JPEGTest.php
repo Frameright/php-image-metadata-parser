@@ -1,53 +1,58 @@
 <?php
-
 namespace CSD\Image\Tests\Format;
 
 use CSD\Image\Format\JPEG;
 use CSD\Image\Metadata\Xmp;
 
 /**
- * @author Daniel Chesterton <daniel@chestertondevelopment.com>
- *
  * @coversDefaultClass \CSD\Image\Format\JPEG
  */
 class JPEGTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * Test that JPEG can read XMP embedded with Photo Mechanic.
+     * Data provider for testGetXmp method.
+     *
+     * @return array
      */
-    public function testGetXmpPhotoMechanic()
+    public function providerTestGetXmp()
     {
-        $jpeg = JPEG::fromFile(__DIR__ . '/../Fixtures/metapm.jpg');
-
-        $xmp = $jpeg->getXmp();
-
-        $this->assertInstanceOf(Xmp::class, $xmp);
-        $this->assertSame('Headline', $xmp->getHeadline());
+        return [
+            // [method, filename, expectedHeadline]
+            ['fromFile', 'metapm.jpg', 'Headline'],
+            ['fromString', 'metapm.jpg', 'Headline'],
+            ['fromFile', 'metaphotoshop.jpg', 'Headline'],
+            ['fromString', 'metaphotoshop.jpg', 'Headline'],
+            ['fromFile', 'nometa.jpg', null],
+            ['fromString', 'nometa.jpg', null],
+        ];
     }
 
     /**
-     * Test that JPEG can read XMP embedded with Photoshop.
+     * Test that JPEG can read XMP data using both fromFile and fromString methods.
+     *
+     * @dataProvider providerTestGetXmp
+     *
+     * @param string      $method          The method to use ('fromFile' or 'fromString')
+     * @param string      $filename        The filename of the test image
+     * @param string|null $expectedHeadline The expected headline in the XMP data
      */
-    public function testGetXmpPhotoshop()
+    public function testGetXmp($method, $filename, $expectedHeadline)
     {
-        $jpeg = JPEG::fromFile(__DIR__ . '/../Fixtures/metaphotoshop.jpg');
+        $filePath = __DIR__ . '/../Fixtures/' . $filename;
+
+        if ($method === 'fromFile') {
+            $jpeg = JPEG::fromFile($filePath);
+        } elseif ($method === 'fromString') {
+            $string = file_get_contents($filePath);
+            $jpeg = JPEG::fromString($string);
+        } else {
+            throw new \InvalidArgumentException("Invalid method: $method");
+        }
 
         $xmp = $jpeg->getXmp();
 
         $this->assertInstanceOf(Xmp::class, $xmp);
-        $this->assertSame('Headline', $xmp->getHeadline());
-    }
-
-    /**
-     * Test that JPEG class returns an empty XMP object when there is no XMP data.
-     */
-    public function testGetXmpNoMeta()
-    {
-        $jpeg = JPEG::fromFile(__DIR__ . '/../Fixtures/nometa.jpg');
-
-        $xmp = $jpeg->getXmp();
-
-        $this->assertInstanceOf(Xmp::class, $xmp);
-        $this->assertNull($xmp->getHeadline());
+        $this->assertSame($expectedHeadline, $xmp->getHeadline());
     }
 }
+

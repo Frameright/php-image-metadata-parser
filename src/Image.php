@@ -210,29 +210,31 @@ abstract class Image implements ImageInterface
      *
      * @return JPEG|WebP|PNG|false
      */
+
     public static function fromString($string)
     {
-        $len = strlen($string);
+        $imageInfo = getimagesizefromstring($string);
 
-        // try JPEG
-        if ($len >= 2) {
-            if (JPEG::SOI === substr($string, 0, 2)) {
-                return JPEG::fromString($string);
-            }
+        if (!$imageInfo) {
+            return false;
         }
 
-        // try WebP
-        if ($len >= 4) {
-            if ('RIFF' === substr($string, 0, 4) && 'WEBP' === substr($string, 8, 4)) {
-                return WebP::fromString($string);
-            }
-        }
+        $width = $imageInfo[0];
+        $height = $imageInfo[1];
+        $mime = $imageInfo['mime'];
 
-        // try PNG
-        if ($len >= 8) {
-            if (PNG::SIGNATURE === substr($string, 0, 8)) {
-                return PNG::fromString($string);
-            }
+        $mimeToClass = [
+            'image/jpeg' => JPEG::class,
+            'image/png'  => PNG::class,
+            'image/webp' => WebP::class,
+        ];
+
+        if (isset($mimeToClass[$mime])) {
+            $class = $mimeToClass[$mime];
+            $image = $class::fromString($string);
+            $image->width = $width;
+            $image->height = $height;
+            return $image;
         }
 
         return false;
