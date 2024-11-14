@@ -49,6 +49,9 @@ class JPEGTest extends \PHPUnit\Framework\TestCase
             throw new \InvalidArgumentException("Invalid method: $method");
         }
 
+        $this->assertInstanceOf(JPEG::class, $jpeg);
+        $this->assertGreaterThan(0, $jpeg->getSize()["width"]);
+
         $xmp = $jpeg->getXmp();
 
         $this->assertInstanceOf(Xmp::class, $xmp);

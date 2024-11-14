@@ -51,6 +51,9 @@ class PNGTest extends \PHPUnit\Framework\TestCase
             throw new \InvalidArgumentException("Invalid method: $method");
         }
 
+        $this->assertInstanceOf(PNG::class, $png);
+        $this->assertGreaterThan(0, $png->getSize()["width"]);
+
         $xmp = $png->getXmp();
 
         $this->assertInstanceOf(Xmp::class, $xmp);
