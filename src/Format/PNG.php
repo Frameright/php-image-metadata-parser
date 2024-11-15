@@ -40,6 +40,8 @@ class PNG extends Image
         }
 
         $this->chunks = $this->getChunksFromContents($contents);
+
+        $this->setSizeFromString($contents);
     }
 
     /**
@@ -101,7 +103,22 @@ class PNG extends Image
      */
     public static function fromFile($filename)
     {
-        return new self(file_get_contents($filename));
+        $contents = file_get_contents($filename);
+        if ($contents === false) {
+            throw new \Exception(sprintf('Could not open file %s', $filename));
+        }
+
+        return new self($contents);
+    }
+
+    /**
+     * @param $string
+     *
+     * @return PNG
+     */
+    public static function fromString($string)
+    {
+        return new self($string);
     }
 
     /**

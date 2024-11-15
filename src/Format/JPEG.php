@@ -85,7 +85,10 @@ class JPEG extends Image
         fwrite($stream, $string);
         rewind($stream);
 
-        return self::fromStream($stream);
+        $jpeg = self::fromStream($stream);
+        $jpeg->setSizeFromString($string);
+
+        return $jpeg;
     }
 
     /**
@@ -108,6 +111,8 @@ class JPEG extends Image
      *
      * @return self
      * @throws \Exception
+     *
+     * @todo calculate and set image size
      */
     public static function fromStream($fileHandle)
     {
@@ -189,12 +194,14 @@ class JPEG extends Image
     public static function fromFile($filename)
     {
         $fileHandle = @fopen($filename, 'rb');
-
         if (!$fileHandle) {
             throw new \Exception(sprintf('Could not open file %s', $filename));
         }
 
-        return self::fromStream($fileHandle);
+        $jpeg = self::fromStream($fileHandle);
+        $jpeg->setSizeFromFile($filename);
+
+        return $jpeg;
     }
 
     /**

@@ -30,12 +30,44 @@ class ImageTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @covers ::fromString
+     * @covers ::getSize
+     */
+    public function testPNGFromString()
+    {
+        $string = \file_get_contents(__DIR__ . '/Fixtures/nometa.png');
+        $image = Image::fromString($string);
+
+        $this->assertInstanceOf(PNG::class, $image);
+        $this->assertSame([
+            'width' => 10,
+            'height' => 10,
+        ], $image->getSize());
+    }
+
+    /**
      * @covers ::fromFile
      * @covers ::getSize
      */
     public function testJPG()
     {
         $image = Image::fromFile(__DIR__ . '/Fixtures/nometa.jpg');
+        $this->assertInstanceOf(JPEG::class, $image);
+        $this->assertSame([
+            'width' => 10,
+            'height' => 10,
+        ], $image->getSize());
+    }
+
+    /**
+     * @covers ::fromString
+     * @covers ::getSize
+     */
+    public function testJPGFromString()
+    {
+        $string = \file_get_contents(__DIR__ . '/Fixtures/nometa.jpg');
+
+        $image = Image::fromString($string);
         $this->assertInstanceOf(JPEG::class, $image);
         $this->assertSame([
             'width' => 10,
@@ -56,6 +88,23 @@ class ImageTest extends \PHPUnit\Framework\TestCase
             'height' => 368,
         ], $image->getSize());
     }
+
+    /**
+     * @covers ::fromString
+     * @covers ::getSize
+     */
+    public function testWebpFromString()
+    {
+        $string = \file_get_contents(__DIR__ . '/Fixtures/simple.webp');
+        $image = Image::fromString($string);
+
+        $this->assertInstanceOf(WebP::class, $image);
+        $this->assertSame([
+            'width' => 550,
+            'height' => 368,
+        ], $image->getSize());
+    }
+
 
     /**
      * @covers ::fromFile

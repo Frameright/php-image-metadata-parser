@@ -198,10 +198,6 @@ abstract class Image implements ImageInterface
         if (!$result) {
             throw new \Exception('Unrecognised file name');
         }
-
-        $size = getimagesize($fileName);
-        $result->width = $size[0];
-        $result->height = $size[1];
         return $result;
     }
 
@@ -210,31 +206,46 @@ abstract class Image implements ImageInterface
      *
      * @return JPEG|WebP|PNG|false
      */
+
     public static function fromString($string)
     {
-        $len = strlen($string);
+        $imageInfo = getimagesizefromstring($string);
 
-        // try JPEG
-        if ($len >= 2) {
-            if (JPEG::SOI === substr($string, 0, 2)) {
-                return JPEG::fromString($string);
-            }
+        if (!$imageInfo) {
+            return false;
         }
 
-        // try WebP
-        if ($len >= 4) {
-            if ('RIFF' === substr($string, 0, 4) && 'WEBP' === substr($string, 8, 4)) {
-                return WebP::fromString($string);
-            }
-        }
+        $mime = $imageInfo['mime'];
 
-        // try PNG
-        if ($len >= 8) {
-            if (PNG::SIGNATURE === substr($string, 0, 8)) {
-                return PNG::fromString($string);
-            }
+        $mimeToClass = [
+            'image/jpeg' => JPEG::class,
+            'image/png'  => PNG::class,
+            'image/webp' => WebP::class,
+        ];
+
+        if (isset($mimeToClass[$mime])) {
+            $class = $mimeToClass[$mime];
+            $image = $class::fromString($string);
+            return $image;
         }
 
         return false;
+    }
+
+    protected function setSizeFromFile($fileName)
+    {
+        $imageSize = getimagesize($fileName);
+        if ($imageSize === false) {
+            throw new \Exception(sprintf('Could not get image size for %s', $fileName));
+        }
+        $this->width = $imageSize[0];
+        $this->height = $imageSize[1];
+    }
+
+    protected function setSizeFromString($string)
+    {
+        $size = getimagesizefromstring($string);
+        $this->width = $size[0];
+        $this->height = $size[1];
     }
 }

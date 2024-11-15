@@ -47,6 +47,8 @@ class WebP extends Image
         if (!$this->isExtendedFormat()) {
 //            throw new \Exception('Only extended WebP format is supported');
         }
+
+        $this->setSizeFromString($contents);
     }
 
     /**
@@ -144,8 +146,23 @@ class WebP extends Image
      */
     public static function fromFile($filename)
     {
-        // var_dump($filename);
-        return new self(file_get_contents($filename));
+        $contents = file_get_contents($filename);
+        if ($contents === false) {
+            throw new \Exception(sprintf('Could not open file %s', $filename));
+        }
+
+        return new self($contents);
+    }
+
+
+    /**
+     * @param $string
+     *
+     * @return PNG
+     */
+    public static function fromString($string)
+    {
+        return new self($string);
     }
 
     /**
