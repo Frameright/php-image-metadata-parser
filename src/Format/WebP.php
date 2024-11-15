@@ -47,6 +47,8 @@ class WebP extends Image
         if (!$this->isExtendedFormat()) {
 //            throw new \Exception('Only extended WebP format is supported');
         }
+
+        $this->setSizeFromString($contents);
     }
 
     /**
@@ -144,20 +146,12 @@ class WebP extends Image
      */
     public static function fromFile($filename)
     {
-        $imageSize = getimagesize($filename);
-        if ($imageSize === false) {
-            throw new \Exception(sprintf('Could not get image size for %s', $filename));
+        $contents = file_get_contents($filename);
+        if ($contents === false) {
+            throw new \Exception(sprintf('Could not open file %s', $filename));
         }
 
-        $width = $imageSize[0];
-        $height = $imageSize[1];
-
-        $webp = new self(file_get_contents($filename));
-
-        $webp->width = $width;
-        $webp->height = $height;
-
-        return $webp;
+        return new self($contents);
     }
 
 
@@ -168,20 +162,7 @@ class WebP extends Image
      */
     public static function fromString($string)
     {
-        $imageSize = getimagesizefromstring($string);
-        if ($imageSize === false) {
-            throw new \Exception('Invalid WebP data');
-        }
-
-        $width = $imageSize[0];
-        $height = $imageSize[1];
-
-        $webp = new self($string);
-
-        $webp->width = $width;
-        $webp->height = $height;
-
-        return $webp;
+        return new self($string);
     }
 
     /**

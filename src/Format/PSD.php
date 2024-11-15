@@ -4,6 +4,7 @@ namespace CSD\Image\Format;
 
 use CSD\Image\Metadata\Exif;
 use CSD\Image\Metadata\Iptc;
+use CSD\Image\Metadata\UnsupportedException;
 use CSD\Image\Metadata\Xmp;
 use CSD\Image\Image;
 
@@ -70,6 +71,8 @@ class PSD extends Image {
 
     /**
      * Load PSD from string.
+     *
+     * @todo calculate and set image size
      */
     public static function fromString($string)
     {
@@ -96,6 +99,8 @@ class PSD extends Image {
      *
      * @return self
      * @throws \Exception
+     *
+     * @todo calculate and set image size
      */
     public static function fromStream($fileHandle)
     {
@@ -194,7 +199,9 @@ class PSD extends Image {
             throw new \Exception(sprintf('Could not open file %s', $filename));
         }
 
-        return self::fromStream($fileHandle);
+        $psd = self::fromStream($fileHandle);
+        $psd->setSizeFromFile($filename);
+        return $psd;
     }
 
     /**

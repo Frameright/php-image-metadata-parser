@@ -198,10 +198,6 @@ abstract class Image implements ImageInterface
         if (!$result) {
             throw new \Exception('Unrecognised file name');
         }
-
-        $size = getimagesize($fileName);
-        $result->width = $size[0];
-        $result->height = $size[1];
         return $result;
     }
 
@@ -219,8 +215,6 @@ abstract class Image implements ImageInterface
             return false;
         }
 
-        $width = $imageInfo[0];
-        $height = $imageInfo[1];
         $mime = $imageInfo['mime'];
 
         $mimeToClass = [
@@ -232,11 +226,26 @@ abstract class Image implements ImageInterface
         if (isset($mimeToClass[$mime])) {
             $class = $mimeToClass[$mime];
             $image = $class::fromString($string);
-            $image->width = $width;
-            $image->height = $height;
             return $image;
         }
 
         return false;
+    }
+
+    protected function setSizeFromFile($fileName)
+    {
+        $imageSize = getimagesize($fileName);
+        if ($imageSize === false) {
+            throw new \Exception(sprintf('Could not get image size for %s', $fileName));
+        }
+        $this->width = $imageSize[0];
+        $this->height = $imageSize[1];
+    }
+
+    protected function setSizeFromString($string)
+    {
+        $size = getimagesizefromstring($string);
+        $this->width = $size[0];
+        $this->height = $size[1];
     }
 }
