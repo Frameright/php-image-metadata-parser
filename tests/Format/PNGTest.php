@@ -53,6 +53,7 @@ class PNGTest extends \PHPUnit\Framework\TestCase
 
         $this->assertInstanceOf(PNG::class, $png);
         $this->assertGreaterThan(0, $png->getSize()["width"]);
+        $this->assertGreaterThan(0, $png->getSize()["height"]);
 
         $xmp = $png->getXmp();
 

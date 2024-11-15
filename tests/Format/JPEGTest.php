@@ -51,6 +51,7 @@ class JPEGTest extends \PHPUnit\Framework\TestCase
 
         $this->assertInstanceOf(JPEG::class, $jpeg);
         $this->assertGreaterThan(0, $jpeg->getSize()["width"]);
+        $this->assertGreaterThan(0, $jpeg->getSize()["height"]);
 
         $xmp = $jpeg->getXmp();
 

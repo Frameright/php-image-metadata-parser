@@ -144,8 +144,22 @@ class WebP extends Image
      */
     public static function fromFile($filename)
     {
-        return new self(file_get_contents($filename));
+        $imageSize = getimagesize($filename);
+        if ($imageSize === false) {
+            throw new \Exception(sprintf('Could not get image size for %s', $filename));
+        }
+
+        $width = $imageSize[0];
+        $height = $imageSize[1];
+
+        $webp = new self(file_get_contents($filename));
+
+        $webp->width = $width;
+        $webp->height = $height;
+
+        return $webp;
     }
+
 
     /**
      * @param $string
@@ -154,7 +168,20 @@ class WebP extends Image
      */
     public static function fromString($string)
     {
-        return new self($string);
+        $imageSize = getimagesizefromstring($string);
+        if ($imageSize === false) {
+            throw new \Exception('Invalid WebP data');
+        }
+
+        $width = $imageSize[0];
+        $height = $imageSize[1];
+
+        $webp = new self($string);
+
+        $webp->width = $width;
+        $webp->height = $height;
+
+        return $webp;
     }
 
     /**

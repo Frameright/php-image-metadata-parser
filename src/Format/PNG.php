@@ -101,7 +101,20 @@ class PNG extends Image
      */
     public static function fromFile($filename)
     {
-        return new self(file_get_contents($filename));
+        $imageSize = getimagesize($filename);
+        if ($imageSize === false) {
+            throw new \Exception(sprintf('Could not get image size for %s', $filename));
+        }
+
+        $width = $imageSize[0];
+        $height = $imageSize[1];
+
+        $png = new self(file_get_contents($filename));
+
+        $png->width = $width;
+        $png->height = $height;
+
+        return $png;
     }
 
     /**
@@ -111,7 +124,20 @@ class PNG extends Image
      */
     public static function fromString($string)
     {
-        return new self($string);
+        $imageSize = getimagesizefromstring($string);
+        if ($imageSize === false) {
+            throw new \Exception('Invalid PNG data');
+        }
+
+        $width = $imageSize[0];
+        $height = $imageSize[1];
+
+        $png = new self($string);
+
+        $png->width = $width;
+        $png->height = $height;
+
+        return $png;
     }
 
     /**

@@ -50,6 +50,7 @@ class WebPTest extends \PHPUnit\Framework\TestCase
 
         $this->assertInstanceOf(WebP::class, $webp);
         $this->assertGreaterThan(0, $webp->getSize()["width"]);
+        $this->assertGreaterThan(0, $webp->getSize()["height"]);
 
         $xmp = $webp->getXmp();
 
